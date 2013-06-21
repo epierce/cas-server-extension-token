@@ -15,108 +15,96 @@
  */
 package edu.usf.cas.support.token.authentication.handler.support;
 
-import java.util.Date;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-
+import edu.usf.cas.support.token.authentication.principal.TokenCredentials;
 import org.apache.commons.codec.binary.Base64;
-
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import javax.crypto.BadPaddingException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-
 import org.jasig.cas.authentication.handler.AuthenticationException;
 import org.jasig.cas.authentication.handler.BadCredentialsAuthenticationException;
 import org.jasig.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;
 import org.jasig.cas.authentication.principal.Credentials;
-import edu.usf.cas.support.token.authentication.principal.TokenCredentials;
-import org.springframework.webflow.context.ExternalContextHolder;
-
 import org.json.JSONObject;
-import org.json.JSONException;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.util.Date;
 
 /**
- * This handler authenticates token credentials 
- * 
+ * This handler authenticates token credentials
+ *
  * @author Eric Pierce
  * @since 3.5.0
  */
 public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessingAuthenticationHandler {
-    
-	/** Key used for AES128 encryption **/
-	private String encryptionKey;
 
-	/** Maximum amount of time (before or after current time) that the 'generated' parameter in the supplied token can differ from the server **/
-	private int maxDrift;
+  /** Key used for AES128 encryption **/
+  private String encryptionKey;
 
-    public boolean supports(Credentials credentials) {
-        return credentials != null && (TokenCredentials.class.isAssignableFrom(credentials.getClass()));
+  /** Maximum amount of time (before or after current time) that the 'generated' parameter in the supplied token can differ from the server **/
+  private int maxDrift;
+
+  public boolean supports(Credentials credentials) {
+      return credentials != null && (TokenCredentials.class.isAssignableFrom(credentials.getClass()));
+  }
+
+  @Override
+  protected boolean doAuthentication(Credentials credentials) throws AuthenticationException {
+    TokenCredentials credential = (TokenCredentials) credentials;
+
+    try {
+      String result = decrypt(this.encryptionKey, credential.getToken());
+      log.debug("Got decryption result : {}", result);
+
+      JSONObject json = new JSONObject(result);
+      log.debug("Got username from token : {}", json.get("username"));
+      String jsonUsername = json.getString("username");
+
+      //Get the difference between the generated time and now
+      int genTimeDiff = (int) (new Date().getTime() - json.getLong("generated")) / 1000;
+      if (genTimeDiff < 0) genTimeDiff = genTimeDiff * -1;
+      log.debug("Token generated {} seconds ago", genTimeDiff);
+
+
+      if (genTimeDiff > this.maxDrift) {
+        log.warn("Authentication Error: Token expired for {}", jsonUsername);
+        throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.expired");
+      }
+      if (jsonUsername.equals(credential.getUsername())) {
+        log.debug("Authentication Success");
+        credential.setUserAttributes(json);
+        return true;
+      }
+      return false;
+    } catch (InvalidKeyException e) {
+      log.warn(e.getMessage());
+      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.key");
+    } catch (Exception e) {
+      log.warn(e.getMessage());
+      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.json");
     }
-    
-    @Override
-    protected boolean doAuthentication(Credentials credentials) throws AuthenticationException {
-        TokenCredentials credential = (TokenCredentials) credentials;
+  }
 
-		  try {
-        		String result = decrypt(this.encryptionKey,credential.getToken());
-        		log.debug("Got decryption result : {}", result);
+  private String decrypt(String key, String input) throws InvalidKeyException {
+    byte[] output = null;
+    try {
+      SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
+      Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+      cipher.init(Cipher.DECRYPT_MODE, skey);
+      output = cipher.doFinal(Base64.decodeBase64(input));
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new InvalidKeyException();
 
-            JSONObject json = new JSONObject(result);
-            log.debug("Got username from token : {}", json.get("username"));
-            String jsonUsername = json.getString("username");
-
-				//Get the difference between the generated time and now
-            int genTimeDiff = (int) (new Date().getTime() - json.getLong("generated")) / 1000;
-				if (genTimeDiff < 0) genTimeDiff = genTimeDiff * -1 ;
-				log.debug("Token generated {} seconds ago", genTimeDiff);
-
-				
-				if( genTimeDiff > this.maxDrift){
-						log.warn("Authentication Error: Token expired for {}", jsonUsername);
-						throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.expired");
-				}
-            if(jsonUsername.equals(credential.getUsername())) {
-                log.debug("Authentication Success");
-                credential.setUserAttributes(json);
-                return true;
-            }
-        		return false;
-        } 
-        catch (InvalidKeyException e) {
-             log.warn(e.getMessage());
-             throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.key");
-        }
-        catch (Exception e) {
-            log.warn(e.getMessage());
-				throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.json");
-        }
     }
+    return new String(output);
+  }
 
-    private String decrypt(String key, String input) throws InvalidKeyException{
-        byte[] output = null;
-        try{
-          SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
-          Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-          cipher.init(Cipher.DECRYPT_MODE, skey);
-          output = cipher.doFinal(Base64.decodeBase64(input));
-        }catch(Exception e){
-				log.error(e.getMessage());
-				throw new InvalidKeyException();
+  public final void setEncryptionKey(final String encryptionKey) {
+    this.encryptionKey = encryptionKey;
+  }
 
-        }
-        return new String(output);
-    } 
+  public final void setMaxDrift(final int maxDrift) {
+    this.maxDrift = maxDrift;
+  }
 
-	public final void setEncryptionKey(final String encryptionKey){
-		this.encryptionKey = encryptionKey;
-	}
 
-  public final void setMaxDrift(final int maxDrift){
-		this.maxDrift = maxDrift;
-	}
-
-    
 }
