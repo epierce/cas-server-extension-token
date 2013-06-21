@@ -46,6 +46,8 @@
   <properties>
         <cas.version>3.5.0</cas.version>
         <json.version>20090211</json.version>
+    <junit.version>4.11</junit.version>
+    <logback.version>1.0.13</logback.version>
   </properties>
   
   <dependencies>
@@ -61,11 +63,18 @@
         <version>${json.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
   
   <build>
     <plugins>
-      
+
     </plugins>
   </build>
   
