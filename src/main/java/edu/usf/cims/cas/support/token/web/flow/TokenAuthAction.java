@@ -43,47 +43,47 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public final class TokenAuthAction extends AbstractAction {
     
-    private static final String TOKEN_PARAMETER = "auth_token";
+  private static final String TOKEN_PARAMETER = "auth_token";
 
-    private static final Logger logger = LoggerFactory.getLogger(TokenAuthAction.class);
+  private static final Logger logger = LoggerFactory.getLogger(TokenAuthAction.class);
+  
+  @NotNull 
+  private CentralAuthenticationService centralAuthenticationService;
+  
+  @Override
+  protected Event doExecute(RequestContext context) throws Exception {
+    HttpServletRequest request = WebUtils.getHttpServletRequest(context);
+    HttpSession session = request.getSession();
     
-    @NotNull 
-    private CentralAuthenticationService centralAuthenticationService;
-    
-    @Override
-    protected Event doExecute(RequestContext context) throws Exception {
-        HttpServletRequest request = WebUtils.getHttpServletRequest(context);
-        HttpSession session = request.getSession();
-        
-        // get token and username values
-        String authTokenValue = request.getParameter(TOKEN_PARAMETER);
-        String username = request.getParameter("username");
+    // get token and username values
+    String authTokenValue = request.getParameter(TOKEN_PARAMETER);
+    String username = request.getParameter("username");
 
-        // Token exists
-        if ( StringUtils.isNotBlank(authTokenValue) && StringUtils.isNotBlank(username)) {
+    // Token exists
+    if ( StringUtils.isNotBlank(authTokenValue) && StringUtils.isNotBlank(username)) {
 
-            logger.debug("Got an authentication token: {} for username {}.", authTokenValue, username);
+      logger.debug("Got an authentication token: {} for username {}.", authTokenValue, username);
 
-            // get credential
-            @SuppressWarnings("unchecked")
-            TokenCredentials credential = new TokenCredentials(username,authTokenValue);
-            
-            // put service in session from flow scope
-            Service service = (Service) context.getFlowScope().get("service");
-            session.setAttribute("service", service);
-                       
-            try {
-                WebUtils.putTicketGrantingTicketInRequestScope(context, this.centralAuthenticationService
-                    .createTicketGrantingTicket(credential));
-                return success();
-            } catch (final TicketException e) {
-                return error();
-            }
-        } 
+      // get credential
+      @SuppressWarnings("unchecked")
+      TokenCredentials credential = new TokenCredentials(username,authTokenValue);
+      
+      // put service in session from flow scope
+      Service service = (Service) context.getFlowScope().get("service");
+      session.setAttribute("service", service);
+                 
+      try {
+        WebUtils.putTicketGrantingTicketInRequestScope(context, this.centralAuthenticationService
+                .createTicketGrantingTicket(credential));
+        return success();
+      } catch (final TicketException e) {
         return error();
-    }
-    
-    public void setCentralAuthenticationService(CentralAuthenticationService centralAuthenticationService) {
-        this.centralAuthenticationService = centralAuthenticationService;
-    }
+      }
+    } 
+    return error();
+  }
+  
+  public void setCentralAuthenticationService(CentralAuthenticationService centralAuthenticationService) {
+    this.centralAuthenticationService = centralAuthenticationService;
+  }
 }

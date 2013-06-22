@@ -35,84 +35,80 @@ import org.slf4j.LoggerFactory;
  * This class creates a CAS-compatible credential using data from an AES128-encrypted token
  * 
  * @author Eric Pierce
- * @since 3.5.0
+ * @since 0.1
  */
 public final class TokenCredentials implements Credentials {
     
-    private static final long serialVersionUID = 2749515041385101768L;
+  private static final long serialVersionUID = 2749515041385101768L;
 
-	 private static final Logger logger = LoggerFactory.getLogger(TokenCredentials.class);
+  private static final Logger logger = LoggerFactory.getLogger(TokenCredentials.class);
 
-    private String token;
+  private String token;
+
+  private String username;
+
+  private Map<String, Object> userAttributes;
+
+  public TokenCredentials(final String username, final String token) {
+    Assert.notNull(token, "token cannot be null");
+    Assert.notNull(token, "username cannot be null");
+    this.token = token;
+    this.username = username;
+  }
+
+  public final void setToken(final String token) {
+    this.token = token;
+  }
+
+  public final String getToken() {
+    return this.token;
+  }
+
+  public final void setUsername(final String username) {
+    this.username = username;
+  }
+
+  public final String getUsername() {
+    return this.username;
+  }
     
-    private String username;
+  /**
+  * Create a map of the User's Attributes from a JSONObject 
+  *
+  * @param JSONObject userProfile
+  */
+  public void setUserAttributes(JSONObject userProfile) {    
+    Map<String,Object> userAttributes = new HashMap<String,Object>();
     
-    private Map<String, Object> userAttributes;
-
-    public TokenCredentials(final String username, final String token) {
-        Assert.notNull(token, "token cannot be null");
-        Assert.notNull(token, "username cannot be null");
-        this.token = token;
-        this.username = username;
-    }
-
-    public final void setToken(final String token) {
-        this.token = token;
-    }
-
-    public final String getToken() {
-        return this.token;
-    }
-
-    public final void setUsername(final String username) {
-        this.username = username;
-    }
-
-    public final String getUsername() {
-        return this.username;
+    try {
+      if((userProfile.has("firstname"))&&(userProfile.has("lastname"))) {
+        userAttributes.put("DisplayName", userProfile.get("firstname")+" "+userProfile.get("lastname"));
+        userAttributes.put("FamilyName", userProfile.get("lastname"));
+        userAttributes.put("GivenName", userProfile.get("firstname"));
+      }
+      if(userProfile.has("email")) {
+        userAttributes.put("Email",userProfile.get("email"));
+      }
+      userAttributes.put("PreferredUsername", userProfile.get("username"));
+    } 
+    catch (JSONException e) {
+      logger.error(e.getMessage());
     }
     
-    /**
-    * Create a map of the User's Attributes from a JSONObject 
-    *
-    * @param JSONObject userProfile
-    */
+    this.userAttributes = userAttributes;
+    logger.debug("userAttributes : {}", userAttributes);
+      
+  }
 
-    public void setUserAttributes(JSONObject userProfile) {    
-        Map<String,Object> userAttributes = new HashMap<String,Object>();
+  public final Map<String, Object> getUserAttributes() {
+    return this.userAttributes;
+  }
 
-        //Static Values
-        userAttributes.put("ProviderName", "UsfNetid");
-        
-        try {
-            if((userProfile.has("firstname"))&&(userProfile.has("lastname"))) {
-                userAttributes.put("DisplayName", userProfile.get("firstname")+" "+userProfile.get("lastname"));
-                userAttributes.put("FamilyName", userProfile.get("lastname"));
-                userAttributes.put("GivenName", userProfile.get("firstname"));
-            }
-            if(userProfile.has("email")) {
-                userAttributes.put("Email",userProfile.get("email"));
-            }
-            userAttributes.put("PreferredUsername", userProfile.get("username"));
-        } 
-        catch (JSONException e) {
-            logger.error(e.getMessage());
-        }
-        
-        this.userAttributes = userAttributes;
-			logger.debug("userAttributes : {}", userAttributes);
-        
+  public String toString() {
+    if (this.userAttributes != null && this.userAttributes.containsKey("PreferredUsername")){
+      return (String) userAttributes.get("PreferredUsername");
+    } else {
+      return "[authentication token: " + this.username + ":" + this.token + "]";
     }
-
-    public final Map<String, Object> getUserAttributes() {
-        return this.userAttributes;
-    }
-
-    public String toString() {
-        if (this.userAttributes.containsKey("PreferredUsername")){
-            return (String) userAttributes.get("PreferredUsername");
-        } else {
-            return "[authentication token: " +this.username+":"+ this.token + "]";
-        }
-    }
+  }
 }
