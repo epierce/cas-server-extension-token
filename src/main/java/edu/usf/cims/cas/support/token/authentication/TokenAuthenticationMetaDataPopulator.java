@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package edu.usf.cas.support.token.authentication;
+package edu.usf.cims.cas.support.token.authentication;
 
 import org.jasig.cas.authentication.Authentication;
 import org.jasig.cas.authentication.AuthenticationMetaDataPopulator;
@@ -21,7 +21,7 @@ import org.jasig.cas.authentication.MutableAuthentication;
 import org.jasig.cas.authentication.principal.Credentials;
 import org.jasig.cas.authentication.principal.Principal;
 import org.jasig.cas.authentication.principal.SimplePrincipal;
-import edu.usf.cas.support.token.authentication.principal.TokenCredentials;
+import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

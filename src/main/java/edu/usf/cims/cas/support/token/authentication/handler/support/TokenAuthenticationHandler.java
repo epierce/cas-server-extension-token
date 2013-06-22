@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package edu.usf.cas.support.token.authentication.handler.support;
+package edu.usf.cims.cas.support.token.authentication.handler.support;
 
 import java.util.Date;
 
@@ -32,7 +32,7 @@ import org.jasig.cas.authentication.handler.AuthenticationException;
 import org.jasig.cas.authentication.handler.BadCredentialsAuthenticationException;
 import org.jasig.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;
 import org.jasig.cas.authentication.principal.Credentials;
-import edu.usf.cas.support.token.authentication.principal.TokenCredentials;
+import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
 import org.springframework.webflow.context.ExternalContextHolder;
 
 import org.json.JSONObject;

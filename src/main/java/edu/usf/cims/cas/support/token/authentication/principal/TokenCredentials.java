@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package edu.usf.cas.support.token.authentication.principal;
+package edu.usf.cims.cas.support.token.authentication.principal;
 
 import java.util.Map;
 import java.util.HashMap;
