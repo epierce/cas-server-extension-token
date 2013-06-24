@@ -11,6 +11,16 @@ public class Key {
   private byte[] data;
 
   /**
+   * Create a {@linkplain Key} using a {@link String} for both the name
+   * and the data.
+   *
+   * @param name The key name and data.
+   */
+  public Key(String name) {
+    this(name, name.getBytes());
+  }
+
+  /**
    * Create a {@linkplain Key} with a given name and key data using strings.
    *
    * @param name The name of the key.

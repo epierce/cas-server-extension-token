@@ -70,6 +70,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>0.9.18</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
   
   <build>
