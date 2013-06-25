@@ -14,28 +14,20 @@
 */
 package edu.usf.cims.cas.support.token.authentication.handler.support;
 
-import java.util.Date;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Base64;
-
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import javax.crypto.BadPaddingException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-
+import edu.clayton.cas.support.token.Token;
+import edu.clayton.cas.support.token.keystore.Key;
+import edu.clayton.cas.support.token.keystore.Keystore;
+import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
 import org.jasig.cas.authentication.handler.AuthenticationException;
 import org.jasig.cas.authentication.handler.BadCredentialsAuthenticationException;
 import org.jasig.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;
 import org.jasig.cas.authentication.principal.Credentials;
-import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
-import org.springframework.webflow.context.ExternalContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.json.JSONObject;
-import org.json.JSONException;
+import javax.validation.constraints.Size;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * This handler authenticates token credentials 
@@ -44,71 +36,78 @@ import org.json.JSONException;
  * @since 0.1
  */
 public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessingAuthenticationHandler {
-    
+  private final static Logger log = LoggerFactory.getLogger(TokenAuthenticationHandler.class);
+
   /** Key used for AES128 encryption **/
+  @Size(min=16, max=16, message="AES key must be 16 characters!")
   private String encryptionKey;
+
+  /** An instance of a {@link edu.clayton.cas.support.token.keystore.Keystore}. **/
+  private Keystore keystore;
 
   /* Maximum amount of time (before or after current time) that the 'generated' parameter 
    * in the supplied token can differ from the server */
   private int maxDrift;
 
-    public boolean supports(Credentials credentials) {
-        return credentials != null && (TokenCredentials.class.isAssignableFrom(credentials.getClass()));
-    }
+  public boolean supports(Credentials credentials) {
+      return credentials != null && (TokenCredentials.class.isAssignableFrom(credentials.getClass()));
+  }
     
-    @Override
-    protected boolean doAuthentication(Credentials credentials) throws AuthenticationException {
-      TokenCredentials credential = (TokenCredentials) credentials;
+  @Override
+  protected boolean doAuthentication(Credentials credentials) throws AuthenticationException {
+    boolean result = false;
+    TokenCredentials credential = (TokenCredentials) credentials;
 
-      try {
-        String result = decrypt(this.encryptionKey,credential.getToken());
-        log.debug("Got decryption result : {}", result);
-
-        JSONObject json = new JSONObject(result);
-        log.debug("Got username from token : {}", json.get("username"));
-        String jsonUsername = json.getString("username");
-
-        //Get the difference between the generated time and now
-        int genTimeDiff = (int) (new Date().getTime() - json.getLong("generated")) / 1000;
-        if (genTimeDiff < 0) genTimeDiff = genTimeDiff * -1 ;
-        log.debug("Token generated {} seconds ago", genTimeDiff);
-        
-        if( genTimeDiff > this.maxDrift){
-            log.warn("Authentication Error: Token expired for {}", jsonUsername);
-            throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.expired");
-        }
-        if(jsonUsername.equals(credential.getUsername())) {
-          log.debug("Authentication Success");
-          credential.setUserAttributes(json);
-          return true;
-        }
-      
-        return false;
-      
-      } catch (InvalidKeyException e) {
-        throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.key");
-      } catch (Exception e) {
-        log.error(e.getMessage());
-        throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.format");
-      }
+    // Check to see if the api_key is allowed.
+    Key apiKey = this.keystore.getKeyNamed(credential.getTokenService());
+    if (apiKey == null) {
+      log.warn("API key not found in keystore!");
+      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.apikey");
     }
 
-  private String decrypt(String key, String input) throws InvalidKeyException{
-    byte[] output = null;
-    try{
-      SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
-      Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-      cipher.init(Cipher.DECRYPT_MODE, skey);
-      output = cipher.doFinal(Base64.decodeBase64(input));
-    } catch(Exception e){
-      log.error(e.getMessage());
-      throw new InvalidKeyException(e.getMessage());
+    // Configure the credential's token so that it can be decrypted.
+    Token token = credential.getToken();
+    token.setPrimaryKey(apiKey);
+    credential.setToken(token);
+
+    try {
+      credential.setUserAttributes(token.getAttributes());
+    } catch (Exception e) {
+      log.warn("Could not decrypt token!");
+      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.key");
     }
-    return new String(output);
-  } 
+
+    String credUsername = credential.getUsername();
+    String attrUsername = (String) credential.getUserAttributes().get("PreferredUsername");
+
+    log.debug("Got username from token : {}", credUsername);
+
+    // Get the difference between the generated time and now.
+    int genTimeDiff = (int) (new Date().getTime() - token.getGenerated()) / 1000;
+    if (genTimeDiff < 0) genTimeDiff = genTimeDiff * -1;
+    log.debug("Token generated {} seconds ago", genTimeDiff);
+
+    if (genTimeDiff > this.maxDrift) {
+      log.warn("Authentication Error: Token expired for {}", credUsername);
+      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.expired");
+    }
+
+    if (attrUsername.equals(credUsername) &&
+        Arrays.equals(apiKey.data(), token.getEmbeddedKey().data()))
+    {
+      log.debug("Authentication Success");
+      result = true;
+    }
+
+    return result;
+  }
 
   public final void setEncryptionKey(final String encryptionKey){
     this.encryptionKey = encryptionKey;
+  }
+
+  public final void setKeystore(final Keystore keystore) {
+    this.keystore = keystore;
   }
 
   public final void setMaxDrift(final int maxDrift){

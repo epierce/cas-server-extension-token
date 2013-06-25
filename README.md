@@ -8,14 +8,19 @@ The token is a AES-128 encrypted JSON object:
 ```
 {   
     "generated":    1338575644294,
-    "username":    "epierce",
-    "firstname":   "Eric",
-    "lastname":    "Pierce",
-    "email":       "epierce@mail.usf.edu"
+    "api_key":      "abcdefghijklmnop",
+    "credentials":  {
+      "username":    "epierce",
+      "firstname":   "Eric",
+      "lastname":    "Pierce",
+      "email":       "epierce@mail.usf.edu"
+    }
 }
 ```
 
 The _generated_ field is the timestamp in milliseconds.  This value is compared against the system time to verify the age of the token.  The _username_ is also compared to the _username_ request value to ensure this token belongs to this user.
+
+The _api_key_ field is the AES key that was used to encrypt the object. This key is unique to each client service.
 
 To encrypt the token with Java or PHP, use [PHP-Java-AES-Encrypt](https://github.com/stevenholder/PHP-Java-AES-Encrypt)
 
@@ -58,7 +63,8 @@ To authenticate using a token, add the `TokenAuthenticationHandler` bean to the 
       p:httpClient-ref="httpClient" />
     <bean class="edu.usf.cims.cas.support.token.authentication.handler.support.TokenAuthenticationHandler"
       p:encryptionKey="1234567891234567" 
-      p:maxDrift="120" />
+      p:maxDrift="120"
+      p:keystore-ref="jsonKeystore" />
   </list>
  </property>
 ```    
@@ -77,6 +83,32 @@ You'll also need to add `TokenCredentialsToPrincipalResolver` to the list of pri
   </list>
 </property>
 ```
+
+As well as add two new bean definitions:
+
+```
+<bean class="java.io.File" id="jsonKeystoreFile">
+  <constructor-arg value="/path/to/a/keystore.json" />
+</bean>
+<bean class="edu.clayton.cas.support.token.keystore.JSONKeystore" id="jsonKeystore" />
+```
+
+Where a _keystore.json_ file is simply a JSON array of key objects with two properties: _name_ and _data_. For example, the following JSON defines two keys:
+
+```
+[
+  {
+    "name" : "alphabet_key",
+    "data" : "abcdefghijklmnop"
+  },
+  {
+    "name" : "number_key",
+    "data" : "1234567890123456"
+  }
+]
+```
+        
+The _name_ property of a key could be anything. In this module the _name_ field is the value of the "token_service" parameter that a service will provide when requesting authorization. For example, `https://cas.example.com/login?token_service=number_key&auth_token=…` will attempt to use the above "number_key" to decrypt the given "auth_token".
         
 ### Configure Attribute Population and Repository
 To convert the profile data received from the decrypted token, configure the `authenticationMetaDataPopulators` property on the `authenticationManager` bean:
