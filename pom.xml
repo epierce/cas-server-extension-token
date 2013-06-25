@@ -39,7 +39,6 @@
   </developers>
 
   <properties>
-<<<<<<< HEAD
     <cas.version>3.5.2</cas.version>
     <json.version>20090211</json.version>
     <servlet.version>2.5</servlet.version>
