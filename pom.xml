@@ -36,12 +36,26 @@
           <role>Developer</role>
       </roles>
     </developer>
+
+    <developer>
+      <id>jsumners</id>
+      <name>James Sumners</name>
+      <email>jamessumners@mail.clayton.edu</email>
+      <organization>Clayton State University</organization>
+      <organizationUrl>http://www.clayton.edu/</organizationUrl>
+      <roles>
+        <role>Contributor</role>
+      </roles>
+    </developer>
   </developers>
 
   <properties>
     <cas.version>3.5.2</cas.version>
     <json.version>20090211</json.version>
     <servlet.version>2.5</servlet.version>
+    <junit.version>4.11</junit.version>
+    <logback.version>1.0.13</logback.version>
+    <slf4j.version>1.7.5</slf4j.version>
   </properties>
   
   <dependencies>
@@ -49,6 +63,12 @@
       <groupId>org.jasig.cas</groupId>
       <artifactId>cas-server-core</artifactId>
       <version>${cas.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -62,6 +82,26 @@
       <artifactId>servlet-api</artifactId>
       <version>${servlet.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
   </dependencies>
   

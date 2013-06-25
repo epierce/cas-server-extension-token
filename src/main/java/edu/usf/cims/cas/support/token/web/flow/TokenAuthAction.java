@@ -14,25 +14,22 @@
 */
 package edu.usf.cims.cas.support.token.web.flow;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotNull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
 import org.apache.commons.lang.StringUtils;
 import org.jasig.cas.CentralAuthenticationService;
 import org.jasig.cas.authentication.principal.Service;
 import org.jasig.cas.ticket.TicketException;
 import org.jasig.cas.web.support.WebUtils;
-
-import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.webflow.action.AbstractAction;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.constraints.NotNull;
+import java.lang.String;
 
 /**
  * This class represents an action in the webflow to retrieve user information from an AES128 encrypted token. If the auth_token 
@@ -44,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public final class TokenAuthAction extends AbstractAction {
     
   private static final String TOKEN_PARAMETER = "auth_token";
+  private static final String TOKEN_SERVICE_ID = "token_service";
 
   private static final Logger logger = LoggerFactory.getLogger(TokenAuthAction.class);
   
@@ -57,16 +55,22 @@ public final class TokenAuthAction extends AbstractAction {
     
     // get token and username values
     String authTokenValue = request.getParameter(TOKEN_PARAMETER);
+    String tokenService = request.getParameter(TOKEN_SERVICE_ID);
     String username = request.getParameter("username");
 
     // Token exists
     if ( StringUtils.isNotBlank(authTokenValue) && StringUtils.isNotBlank(username)) {
 
-      logger.debug("Got an authentication token: {} for username {}.", authTokenValue, username);
+      logger.debug(
+          "Got an authentication token: {} for username {} from service {}.",
+          authTokenValue,
+          username,
+          tokenService
+      );
 
       // get credential
       @SuppressWarnings("unchecked")
-      TokenCredentials credential = new TokenCredentials(username,authTokenValue);
+      TokenCredentials credential = new TokenCredentials(username, authTokenValue, tokenService);
       
       // put service in session from flow scope
       Service service = (Service) context.getFlowScope().get("service");
