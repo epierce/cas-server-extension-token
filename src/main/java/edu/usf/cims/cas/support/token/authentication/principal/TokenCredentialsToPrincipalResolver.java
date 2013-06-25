@@ -23,19 +23,19 @@ import org.jasig.cas.authentication.principal.CredentialsToPrincipalResolver;
  * This class resolves the principal from the token credential 
  * 
  * @author Eric Pierce
- * @since 3.5.0
+ * @since 0.1
  */
 public final class TokenCredentialsToPrincipalResolver extends AbstractPersonDirectoryCredentialsToPrincipalResolver
-    implements CredentialsToPrincipalResolver {
-    
-    @Override
-    protected String extractPrincipalId(final Credentials credentials) {
-        TokenCredentials tokenCredentials = (TokenCredentials) credentials;
-        String principal = tokenCredentials.getUsername();
-        return principal;
-    }
+  implements CredentialsToPrincipalResolver {
 
-    public boolean supports(final Credentials credentials) {
-        return credentials != null && (TokenCredentials.class.isAssignableFrom(credentials.getClass()));
-    }
+  @Override
+  protected String extractPrincipalId(final Credentials credentials) {
+    TokenCredentials tokenCredentials = (TokenCredentials) credentials;
+    String principal = tokenCredentials.getUsername();
+    return principal;
+  }
+
+  public boolean supports(final Credentials credentials) {
+    return credentials != null && (TokenCredentials.class.isAssignableFrom(credentials.getClass()));
+  }
 }

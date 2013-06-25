@@ -29,7 +29,7 @@ import java.util.Map;
  * This class creates a CAS-compatible credential using data from an AES128-encrypted token
  * 
  * @author Eric Pierce
- * @since 3.5.0
+ * @since 0.1
  */
 public final class TokenCredentials implements Credentials {
 

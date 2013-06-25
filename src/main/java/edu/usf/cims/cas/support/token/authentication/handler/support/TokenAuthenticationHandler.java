@@ -31,7 +31,7 @@ import java.util.Date;
  * This handler authenticates token credentials
  *
  * @author Eric Pierce
- * @since 3.5.0
+ * @since 0.1
  */
 public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessingAuthenticationHandler {
 

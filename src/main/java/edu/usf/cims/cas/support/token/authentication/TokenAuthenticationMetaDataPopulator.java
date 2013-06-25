@@ -27,28 +27,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is a meta data populator for authentication using Janrain Engage. 
+ * This class is a meta data populator for authentication using an encrypted JSON object as a token. 
  * 
  * @author Eric Pierce
- * @since 3.5.0
+ * @since 0.1
  */
 public final class TokenAuthenticationMetaDataPopulator implements AuthenticationMetaDataPopulator {
 
-	private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationMetaDataPopulator.class);
+  private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationMetaDataPopulator.class);
     
-    public Authentication populateAttributes(Authentication authentication, Credentials credentials) {
-        if (credentials instanceof TokenCredentials) {
-          TokenCredentials tokenCredentials = (TokenCredentials) credentials;
-          final Principal simplePrincipal = new SimplePrincipal(authentication.getPrincipal().getId(),
-                                                                  tokenCredentials.getUserAttributes());
-            final MutableAuthentication mutableAuthentication = new MutableAuthentication(simplePrincipal,
-                                                                                          authentication
-                                                                                              .getAuthenticatedDate());
-				logger.debug("attributes : {}",simplePrincipal.getAttributes());
-
-            mutableAuthentication.getAttributes().putAll(authentication.getAttributes());
-            return mutableAuthentication;
-        }
-        return authentication;
+  public Authentication populateAttributes(Authentication authentication, Credentials credentials) {
+    if (credentials instanceof TokenCredentials) {
+      TokenCredentials tokenCredentials = (TokenCredentials) credentials;
+      final Principal simplePrincipal = new SimplePrincipal(authentication.getPrincipal().getId(),
+                                                              tokenCredentials.getUserAttributes());
+      final MutableAuthentication mutableAuthentication = new MutableAuthentication(simplePrincipal,
+                                                                                      authentication.getAuthenticatedDate());
+      logger.debug("attributes : {}",simplePrincipal.getAttributes());
+      mutableAuthentication.getAttributes().putAll(authentication.getAttributes());
+      return mutableAuthentication;
     }
+    return authentication;
+  }
 }
