@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.lang.StringUtils;
 import org.jasig.cas.CentralAuthenticationService;
 import org.jasig.cas.authentication.principal.Service;
@@ -37,11 +40,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * parameter exists in the web request, it is used to create a new TokenCredential.
  * 
  * @author Eric Pierce
- * @since 3.5.0
+ * @since 0.1
  */
 public final class TokenAuthAction extends AbstractAction {
     
     private static final String TOKEN_PARAMETER = "auth_token";
+
+    private static final Logger logger = LoggerFactory.getLogger(TokenAuthAction.class);
     
     @NotNull 
     private CentralAuthenticationService centralAuthenticationService;
@@ -55,8 +60,10 @@ public final class TokenAuthAction extends AbstractAction {
         String authTokenValue = request.getParameter(TOKEN_PARAMETER);
         String username = request.getParameter("username");
 
-        // Token exists, authenticate it with Janrain
-        if ((StringUtils.isNotBlank(authTokenValue))&&(StringUtils.isNotBlank(username))) {
+        // Token exists
+        if ( StringUtils.isNotBlank(authTokenValue) && StringUtils.isNotBlank(username)) {
+
+            logger.debug("Got an authentication token: {} for username {}.", authTokenValue, username);
 
             // get credential
             @SuppressWarnings("unchecked")
