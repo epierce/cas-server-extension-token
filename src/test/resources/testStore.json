@@ -1,0 +1,14 @@
+[
+  {
+    "name" : "foo",
+    "data" : "123456789012345"
+  },
+  {
+    "name" : "bar",
+    "data" : "098765432109876"
+  },
+  {
+    "name" : "foobar",
+    "data" : "abcdefghijklmno"
+  }
+]

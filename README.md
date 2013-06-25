@@ -1,13 +1,22 @@
 # Token Authentication Module for Jasig CAS Server
 
-This module allows you to authenticate and pass attributes for a user with a AES128-encrypted token instead of a password.   
+This module allows you to authenticate and pass attributes for a user with a AES128-encrypted token instead of a password. It uses a JSON repository of encryption keys such that each service can have a unique key. This key can be revoked at any time to prevent further usage by that service.
 
 ## How is the token generated?
 The token is a AES-128 encrypted JSON object:
 
 ```
-{   
-    "generated":    1338575644294,
+{
+    "generated":   1338575644294,
+    "api_key":     "abcdefghijklmnop",
+    "credentials": "[a Base64 encoded encrypted string]"
+}
+```
+
+The _generated_ field is the timestamp in milliseconds.  This value is compared against the system time to verify the age of the token. The _api_key_ is a string, unique to your client, that is used to encrypt the _credentials_ property. The _credentials_ property is an AES-128 encrypted JSON object:
+
+```
+{
     "username":    "epierce",
     "firstname":   "Eric",
     "lastname":    "Pierce",
@@ -15,7 +24,7 @@ The token is a AES-128 encrypted JSON object:
 }
 ```
 
-The _generated_ field is the timestamp in milliseconds.  This value is compared against the system time to verify the age of the token.  The _username_ is also compared to the _username_ request value to ensure this token belongs to this user.
+The _username_ is also compared to the _username_ request value to ensure this token belongs to this user.
 
 To encrypt the token with Java or PHP, use [PHP-Java-AES-Encrypt](https://github.com/stevenholder/PHP-Java-AES-Encrypt)
 
@@ -58,7 +67,8 @@ To authenticate using a token, add the `TokenAuthenticationHandler` bean to the 
       p:httpClient-ref="httpClient" />
     <bean class="edu.usf.cims.cas.support.token.authentication.handler.support.TokenAuthenticationHandler"
       p:encryptionKey="1234567891234567" 
-      p:maxDrift="120" />
+      p:maxDrift="120"
+      p:keystore-ref="jsonKeystore" />
   </list>
  </property>
 ```    
@@ -77,6 +87,32 @@ You'll also need to add `TokenCredentialsToPrincipalResolver` to the list of pri
   </list>
 </property>
 ```
+
+As well as add two new bean definitions:
+
+```
+<bean class="java.io.File" id="jsonKeystoreFile">
+  <constructor-arg value="/path/to/a/keystore.json">
+</bean>
+<bean class="edu.clayton.cas.support.token.keystore.JSONKeystore" id="jsonKeystore" />
+```
+    
+Where a _keystore.json_ file is simply a JSON array of key objects with two properties: _name_ and _data_. For example, following JSON defines two keys:
+
+```
+[
+  {
+    "name" : "abcdefghijklmnop",
+    "data" : "abcdefghijklmnop"
+  },
+  {
+    "name" : "1234567890123456",
+    "data" : "1234567890123456"
+  }
+]
+```
+        
+The _name_ property of a key could be anything, but in this module it is always the same as the _data_ property. The _name_ of the key is what a client will use to encrypt the _credentials_ property of the Token.
         
 ### Configure Attribute Population and Repository
 To convert the profile data received from the decrypted token, configure the `authenticationMetaDataPopulators` property on the `authenticationManager` bean:
