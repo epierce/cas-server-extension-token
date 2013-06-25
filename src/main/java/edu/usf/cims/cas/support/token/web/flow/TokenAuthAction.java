@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package edu.usf.cas.support.token.web.flow;
+package edu.usf.cims.cas.support.token.web.flow;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -25,7 +25,7 @@ import org.jasig.cas.authentication.principal.Service;
 import org.jasig.cas.ticket.TicketException;
 import org.jasig.cas.web.support.WebUtils;
 
-import edu.usf.cas.support.token.authentication.principal.TokenCredentials;
+import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
 
 import org.springframework.webflow.action.AbstractAction;
 import org.springframework.webflow.execution.Event;

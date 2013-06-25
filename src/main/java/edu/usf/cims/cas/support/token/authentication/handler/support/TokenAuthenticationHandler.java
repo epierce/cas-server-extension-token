@@ -13,12 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package edu.usf.cas.support.token.authentication.handler.support;
+package edu.usf.cims.cas.support.token.authentication.handler.support;
 
 import edu.clayton.cas.support.token.Token;
 import edu.clayton.cas.support.token.keystore.Key;
 import edu.clayton.cas.support.token.keystore.Keystore;
-import edu.usf.cas.support.token.authentication.principal.TokenCredentials;
+import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
 import org.jasig.cas.authentication.handler.AuthenticationException;
 import org.jasig.cas.authentication.handler.BadCredentialsAuthenticationException;
 import org.jasig.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;

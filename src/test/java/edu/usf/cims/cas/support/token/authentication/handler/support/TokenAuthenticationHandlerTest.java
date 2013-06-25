@@ -1,7 +1,7 @@
-package edu.usf.cas.support.token.authentication.handler.support;
+package edu.usf.cims.cas.support.token.authentication.handler.support;
 
 import edu.clayton.cas.support.token.keystore.JSONKeystore;
-import edu.usf.cas.support.token.authentication.principal.TokenCredentials;
+import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
 import org.jasig.cas.authentication.handler.BadCredentialsAuthenticationException;
 import org.junit.Before;
 import org.junit.Test;
