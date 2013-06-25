@@ -1,3 +1,4 @@
+target/
 *.class
 
 # Package Files #
@@ -8,4 +9,3 @@
 # IntelliJ Stuff #
 .idea/*
 *.iml
-target
