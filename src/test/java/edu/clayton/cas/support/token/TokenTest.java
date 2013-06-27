@@ -52,7 +52,7 @@ public class TokenTest {
     assertNull(token.getAttributes());
     assertEquals((new Date(0L)).getTime(), token.getGenerated());
 
-    token.setPrimaryKey(this.serverKey);
+    token.setKey(this.serverKey);
     TokenAttributes tokenAttributes = token.getAttributes();
 
     assertEquals(this.generatedTime, token.getGenerated());

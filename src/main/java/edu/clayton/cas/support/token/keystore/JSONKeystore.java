@@ -90,6 +90,7 @@ public class JSONKeystore implements Keystore {
       for (int i = 0, j = array.length(); i < j; i += 1) {
         JSONObject obj = array.getJSONObject(i);
         Key key = new Key(obj.getString("name"), obj.getString("data"));
+        log.debug("Adding {} key to keystore.", key.name());
         this.addKey(key);
       }
     } catch (FileNotFoundException e) {
@@ -144,11 +145,15 @@ public class JSONKeystore implements Keystore {
   }
 
   /**
-   * Set the instance's keystore file to the given {@link File}.
+   * Set the instance's keystore file to the given {@link File}. This will
+   * also invoke
+   * {@link edu.clayton.cas.support.token.keystore.JSONKeystore#loadStoreFile()}.
+   * Thus, you should be sure that the instance is okay to re-initialize.
    *
    * @param file The JSON file.
    */
   public void setStoreFile(File file) {
-    this.storeFile = storeFile;
+    this.storeFile = file;
+    this.loadStoreFile();
   }
 }

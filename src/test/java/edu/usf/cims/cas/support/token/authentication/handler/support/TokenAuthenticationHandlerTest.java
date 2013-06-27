@@ -19,21 +19,27 @@ public class TokenAuthenticationHandlerTest {
       "YieGnGqxysiX2vAhKztLTX+RwBMnwjCpSLXl5+Ja5mDdxfGaA8N+1ZaaNGVffw==";
 
   private TokenAuthenticationHandler handler;
-  private TokenCredentials tokenCredentials;
+  private TokenCredentials validCredentials;
+  private TokenCredentials invalidCredentials;
 
   @Before
   public void setup() {
     this.handler = new TokenAuthenticationHandler();
-    this.tokenCredentials = new TokenCredentials(
+    this.validCredentials = new TokenCredentials(
         "auser",
         this.b64Token,
         "alphabet_key"
+    );
+    this.invalidCredentials = new TokenCredentials(
+        "auser",
+        this.b64Token,
+        "number_key"
     );
   }
 
   @Test
   public void testSupports() {
-    assertTrue(this.handler.supports(tokenCredentials));
+    assertTrue(this.handler.supports(validCredentials));
   }
 
   @Test
@@ -43,10 +49,9 @@ public class TokenAuthenticationHandlerTest {
     JSONKeystore jsonKeystore = new JSONKeystore(keystoreFile);
 
     this.handler.setKeystore(jsonKeystore);
-    this.handler.setEncryptionKey("abcdefghijklmnop");
     this.handler.setMaxDrift(Integer.MAX_VALUE);
 
-    assertTrue(this.handler.doAuthentication(this.tokenCredentials));
+    assertTrue(this.handler.doAuthentication(this.validCredentials));
   }
 
   @Test(expected = BadCredentialsAuthenticationException.class)
@@ -56,9 +61,8 @@ public class TokenAuthenticationHandlerTest {
     JSONKeystore jsonKeystore = new JSONKeystore(keystoreFile);
 
     this.handler.setKeystore(jsonKeystore);
-    this.handler.setEncryptionKey("abcdefghijklmnop");
     this.handler.setMaxDrift(Integer.MAX_VALUE);
 
-    assertFalse(this.handler.doAuthentication(this.tokenCredentials));
+    assertFalse(this.handler.doAuthentication(this.invalidCredentials));
   }
 }

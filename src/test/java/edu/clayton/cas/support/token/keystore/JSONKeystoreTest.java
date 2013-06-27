@@ -10,13 +10,14 @@ import java.net.URL;
 import static org.junit.Assert.*;
 
 public class JSONKeystoreTest {
+  private File keystoreFile;
   private JSONKeystore keystore;
 
   @Before
   public void buildStore() throws URISyntaxException {
     URL url = this.getClass().getClassLoader().getResource("testStore.json");
-    File file = new File(url.toURI());
-    this.keystore = new JSONKeystore(file);
+    this.keystoreFile = new File(url.toURI());
+    this.keystore = new JSONKeystore(this.keystoreFile);
   }
 
   @Test
@@ -46,5 +47,21 @@ public class JSONKeystoreTest {
 
     this.keystore.removeKeyNamed("newKey");
     assertNull(this.keystore.getKeyNamed("newKey"));
+  }
+
+  /**
+   * This test simulates Spring adding the keystore file after it has
+   * already created an instance of {@link JSONKeystore}.
+   */
+  @Test
+  public void nullConstructor() {
+    JSONKeystore jsonKeystore = new JSONKeystore(null);
+    jsonKeystore.setStoreFile(this.keystoreFile);
+
+    Key fooKey = jsonKeystore.getKeyNamed("foo");
+
+    assertNotNull(fooKey);
+    assertEquals("foo", fooKey.name());
+    assertTrue(new String(fooKey.data()).equals("123456789012345"));
   }
 }
