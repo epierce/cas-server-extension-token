@@ -25,7 +25,6 @@ import org.jasig.cas.authentication.principal.Credentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -62,7 +61,7 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
 
     // Configure the credential's token so that it can be decrypted.
     Token token = credential.getToken();
-    token.setPrimaryKey(apiKey);
+    token.setKey(apiKey);
     credential.setToken(token);
 
     try {
@@ -87,9 +86,7 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
       throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.expired");
     }
 
-    if (attrUsername.equals(credUsername) &&
-        Arrays.equals(apiKey.data(), token.getEmbeddedKey().data()))
-    {
+    if (attrUsername.equals(credUsername)) {
       log.debug("Authentication Success");
       result = true;
     }

@@ -34,14 +34,13 @@ import java.util.Date;
  * {@link edu.clayton.cas.support.token.Token#getGenerated()} or
  * {@link edu.clayton.cas.support.token.Token#getAttributes()} methods are
  * invoked. Thus, it is imperative that
- * {@link Token#setPrimaryKey(edu.clayton.cas.support.token.keystore.Key)}
+ * {@link Token#setKey(edu.clayton.cas.support.token.keystore.Key)}
  * method be invoked prior to accessing either of these properties.</p>
  */
 public class Token {
   private final static Logger log = LoggerFactory.getLogger(Token.class);
 
-  private Key primaryKey;
-  private Key embeddedKey;
+  private Key key;
   private String tokenData;
   private boolean isDecoded = false;
 
@@ -56,15 +55,6 @@ public class Token {
    */
   public Token(String data) {
     this.tokenData = data;
-  }
-
-  /**
-   * Retrieve the encryption key that was embedded in the token.
-   *
-   * @return The {@link Token#embeddedKey}.
-   */
-  public Key getEmbeddedKey() {
-    return this.embeddedKey;
   }
 
   /**
@@ -120,8 +110,8 @@ public class Token {
    *
    * @param key A valid {@link Key} object.
    */
-  public void setPrimaryKey(Key key) {
-    this.primaryKey = key;
+  public void setKey(Key key) {
+    this.key = key;
   }
 
   private void decryptData() throws Exception {
@@ -130,9 +120,9 @@ public class Token {
     try {
       log.debug(
           "Decrypting token with key = `{}`",
-          new String(this.primaryKey.data())
+          new String(this.key.data())
       );
-      SecretKeySpec skey = new SecretKeySpec(this.primaryKey.data(), "AES");
+      SecretKeySpec skey = new SecretKeySpec(this.key.data(), "AES");
       Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
       cipher.init(Cipher.DECRYPT_MODE, skey);
 
@@ -142,7 +132,6 @@ public class Token {
       log.debug(jsonObject.toString());
 
       this.generated = jsonObject.getLong("generated");
-      this.embeddedKey = new Key(jsonObject.getString("api_key"));
       this.attributes = new TokenAttributes(
           jsonObject.getJSONObject("credentials").toString()
       );
