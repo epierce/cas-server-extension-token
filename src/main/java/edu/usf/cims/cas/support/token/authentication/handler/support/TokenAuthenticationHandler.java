@@ -77,8 +77,7 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     log.debug("Got username from token : {}", credUsername);
 
     // Get the difference between the generated time and now.
-    int genTimeDiff = (int) (new Date().getTime() - token.getGenerated()) / 1000;
-    if (genTimeDiff < 0) genTimeDiff = genTimeDiff * -1;
+    int genTimeDiff = Math.abs((int) (new Date().getTime() - token.getGenerated()) / 1000);
     log.debug("Token generated {} seconds ago", genTimeDiff);
 
     if (genTimeDiff > this.maxDrift) {
@@ -89,6 +88,9 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     if (attrUsername.equals(credUsername)) {
       log.debug("Authentication Success");
       result = true;
+    } else {
+      log.error("Authentication Error: Client passed username [{}], token generated for [{}]", credUsername, attrUsername);
+      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.username");
     }
 
     return result;
