@@ -26,7 +26,7 @@ public class TokenGenCLI {
     try {
       CommandLine commandLine = parser.parse(options, args);
 
-      String apiKey = commandLine.getOptionValue("service");
+      String service = commandLine.getOptionValue("service");
       String key = commandLine.getOptionValue("key");
       String firstName = commandLine.getOptionValue("fname");
       String lastName = commandLine.getOptionValue("lname");
@@ -40,7 +40,6 @@ public class TokenGenCLI {
       credentials.put("email", email);
 
       JSONObject token = new JSONObject();
-      token.put("api_key", apiKey);
       token.put("generated", (new Date()).getTime());
       token.put("credentials", credentials);
 
@@ -54,7 +53,7 @@ public class TokenGenCLI {
           String.format(
               "?username=%s&token_service=%s&auth_token=%s",
               username,
-              apiKey,
+              service,
               URLEncoder.encode(encryptedToken, "UTF-8")
           )
       );

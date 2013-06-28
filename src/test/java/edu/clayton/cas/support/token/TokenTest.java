@@ -34,7 +34,6 @@ public class TokenTest {
     JSONObject tokenData = new JSONObject();
     this.generatedTime = (new Date()).getTime();
     tokenData.put("generated", this.generatedTime);
-    tokenData.put("api_key", new String(this.clientKey.data()));
     tokenData.put("credentials", new JSONObject(new String(buffer)));
 
     byte[] encryptedTokenData;

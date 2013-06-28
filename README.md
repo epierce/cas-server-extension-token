@@ -7,20 +7,17 @@ The token is a AES-128 encrypted JSON object:
 
 ```
 {   
-    "generated":    1338575644294,
-    "api_key":      "abcdefghijklmnop",
+    "generated":      1338575644294,
     "credentials":  {
-      "username":    "epierce",
-      "firstname":   "Eric",
-      "lastname":    "Pierce",
-      "email":       "epierce@mail.usf.edu"
+      "username":      "epierce",
+      "firstname":     "Eric",
+      "lastname":      "Pierce",
+      "email":         "epierce@mail.usf.edu"
     }
 }
 ```
 
 The _generated_ field is the timestamp in milliseconds.  This value is compared against the system time to verify the age of the token.  The _username_ is also compared to the _username_ request value to ensure this token belongs to this user.
-
-The _api_key_ field is the AES key that was used to encrypt the object. This key is unique to each client service.
 
 To encrypt the token with Java or PHP, use [PHP-Java-AES-Encrypt](https://github.com/stevenholder/PHP-Java-AES-Encrypt)
 
@@ -89,6 +86,7 @@ Finally, define the following bean (to load a `keystore.json` file from `/WEB-IN
       p:storeFile="classpath:keystore.json" />
 ```
 
+### [JSON Keystore format](id:keystore)
 Where a _keystore.json_ file is simply a JSON array of key objects with two properties: _name_ and _data_. For example, the following JSON defines two keys:
 
 ```
@@ -104,7 +102,7 @@ Where a _keystore.json_ file is simply a JSON array of key objects with two prop
 ]
 ```
         
-The _name_ property of a key could be anything. In this module the _name_ field is the value of the "token_service" parameter that a service will provide when requesting authorization. For example, `https://cas.example.com/?token_service=number_key&auth_token=…` will attempt to use the above "number_key" to decrypt the given "auth_token".
+The _name_ property of a key could be anything. In this module, the _name_ property is matched against the value of the "token_service" parameter that services provide when requesting authorization. For example, `https://cas.example.com/?token_service=number_key&auth_token=…` will attempt to use the above "number_key" to decrypt the given "auth_token".
         
 ### Configure Attribute Population and Repository
 To convert the profile data received from the decrypted token, configure the `authenticationMetaDataPopulators` property on the `authenticationManager` bean:

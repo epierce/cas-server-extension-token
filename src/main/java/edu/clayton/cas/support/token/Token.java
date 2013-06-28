@@ -22,9 +22,6 @@ import java.util.Date;
  *     was created
  *   </li>
  *   <li>
- *     {@code api_key}: a string that defines a key unique to the client service
- *   </li>
- *   <li>
  *     {@code credentials}: a serialized {@link TokenAttributes} object
  *   </li>
  * </ul>
