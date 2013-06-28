@@ -62,14 +62,11 @@ To authenticate using a token, add the `TokenAuthenticationHandler` bean to the 
     <bean class="org.jasig.cas.authentication.handler.support.HttpBasedServiceCredentialsAuthenticationHandler"
       p:httpClient-ref="httpClient" />
     <bean class="edu.usf.cims.cas.support.token.authentication.handler.support.TokenAuthenticationHandler"
-      p:encryptionKey="1234567891234567" 
       p:maxDrift="120"
       p:keystore-ref="jsonKeystore" />
   </list>
  </property>
 ```    
-    
-* **encryptionKey**: Encryption key that is shared with the program generating the token (**MUST** be 16 characters)
     
 * **maxDrift**: Number of seconds to allow for clock drift when validating the timestamp of the token.
 
@@ -84,13 +81,12 @@ You'll also need to add `TokenCredentialsToPrincipalResolver` to the list of pri
 </property>
 ```
 
-As well as add two new bean definitions:
+Finally, define the following bean (to load a `keystore.json` file from `/WEB-INF/classes/`):
 
 ```
-<bean class="java.io.File" id="jsonKeystoreFile">
-  <constructor-arg value="/path/to/a/keystore.json" />
-</bean>
-<bean class="edu.clayton.cas.support.token.keystore.JSONKeystore" id="jsonKeystore" />
+<bean class="edu.clayton.cas.support.token.keystore.JSONKeystore"
+      id="jsonKeystore"
+      p:storeFile="classpath:keystore.json" />
 ```
 
 Where a _keystore.json_ file is simply a JSON array of key objects with two properties: _name_ and _data_. For example, the following JSON defines two keys:
@@ -108,7 +104,7 @@ Where a _keystore.json_ file is simply a JSON array of key objects with two prop
 ]
 ```
         
-The _name_ property of a key could be anything. In this module the _name_ field is the value of the "token_service" parameter that a service will provide when requesting authorization. For example, `https://cas.example.com/login?token_service=number_key&auth_token=…` will attempt to use the above "number_key" to decrypt the given "auth_token".
+The _name_ property of a key could be anything. In this module the _name_ field is the value of the "token_service" parameter that a service will provide when requesting authorization. For example, `https://cas.example.com/?token_service=number_key&auth_token=…` will attempt to use the above "number_key" to decrypt the given "auth_token".
         
 ### Configure Attribute Population and Repository
 To convert the profile data received from the decrypted token, configure the `authenticationMetaDataPopulators` property on the `authenticationManager` bean:
