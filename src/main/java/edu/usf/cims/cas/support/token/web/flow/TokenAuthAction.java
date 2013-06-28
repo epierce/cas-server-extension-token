@@ -42,7 +42,8 @@ public final class TokenAuthAction extends AbstractAction {
     
   private static final String TOKEN_PARAMETER = "auth_token";
   private static final String TOKEN_SERVICE_ID = "token_service";
-
+  private static final String USER_ID = "username";
+  
   private static final Logger logger = LoggerFactory.getLogger(TokenAuthAction.class);
   
   @NotNull 
@@ -56,7 +57,7 @@ public final class TokenAuthAction extends AbstractAction {
     // get token and username values
     String authTokenValue = request.getParameter(TOKEN_PARAMETER);
     String tokenService = request.getParameter(TOKEN_SERVICE_ID);
-    String username = request.getParameter("username");
+    String username = request.getParameter(USER_ID);
 
     // Token exists
     if ( StringUtils.isNotBlank(authTokenValue) && StringUtils.isNotBlank(username)) {
