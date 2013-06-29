@@ -1,4 +1,4 @@
-# Token Authentication Module for Jasig CAS Server
+# Token Authentication Module for Jasig CAS Server 3.x
 
 This module allows you to authenticate and pass attributes for a user with a AES128-encrypted token instead of a password.   
 
@@ -7,11 +7,13 @@ The token is a AES-128 encrypted JSON object:
 
 ```
 {   
-    "generated":    1338575644294,
-    "username":    "epierce",
-    "firstname":   "Eric",
-    "lastname":    "Pierce",
-    "email":       "epierce@mail.usf.edu"
+    "generated":      1338575644294,
+    "credentials":  {
+      "username":      "epierce",
+      "firstname":     "Eric",
+      "lastname":      "Pierce",
+      "email":         "epierce@mail.usf.edu"
+    }
 }
 ```
 
@@ -19,7 +21,7 @@ The _generated_ field is the timestamp in milliseconds.  This value is compared 
 
 To encrypt the token with Java or PHP, use [PHP-Java-AES-Encrypt](https://github.com/stevenholder/PHP-Java-AES-Encrypt)
 
-Use the Maven Overlay Method for [configuring CAS](https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method)
+### Example code for generating authentication tokens in multiple languages is available in the [https://github.com/epierce/cas-token-auth-examples](cas-token-auth-examples) repository
 
 ## Adding Token authentication support to CAS
 
@@ -38,13 +40,13 @@ mvn clean package install
 ```
 
 ### Add the Maven dependency
-Add the following block to your `pom.xml`
+Add the following block to the `pom.xml` in your CAS overlay
 
 ```
 <dependency>
   <groupId>edu.usf.cims</groupId>
   <artifactId>cas-server-extension-token</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
 </dependency>
 ```
 
@@ -57,15 +59,13 @@ To authenticate using a token, add the `TokenAuthenticationHandler` bean to the 
     <bean class="org.jasig.cas.authentication.handler.support.HttpBasedServiceCredentialsAuthenticationHandler"
       p:httpClient-ref="httpClient" />
     <bean class="edu.usf.cims.cas.support.token.authentication.handler.support.TokenAuthenticationHandler"
-      p:encryptionKey="1234567891234567" 
-      p:maxDrift="120" />
+      p:maxDrift="60"
+      p:keystore-ref="jsonKeystore" />
   </list>
  </property>
 ```    
     
-* **encryptionKey**: Encryption key that is shared with the program generating the token (**MUST** be 16 characters)
-    
-* **maxDrift**: Number of seconds to allow for clock drift when validating the timestamp of the token.
+* **maxDrift**: Number of seconds (+/-) to allow for clock drift  when validating the timestamp of the token.
 
 You'll also need to add `TokenCredentialsToPrincipalResolver` to the list of principal resolvers:
 
@@ -77,6 +77,34 @@ You'll also need to add `TokenCredentialsToPrincipalResolver` to the list of pri
   </list>
 </property>
 ```
+
+Finally, define the following bean (to load a `keystore.json` file from `/WEB-INF/classes/`):
+
+```
+<bean class="edu.clayton.cas.support.token.keystore.JSONKeystore"
+      id="jsonKeystore"
+      p:storeFile="classpath:keystore.json" />
+```
+
+### [JSON Keystore format](id:keystore)
+Where a _keystore.json_ file is simply a JSON array of key objects with two properties: _name_ and _data_. For example, the following JSON defines two keys:
+
+```
+[
+  {
+    "name" : "alphabet_key",
+    "data" : "abcdefghijklmnop"
+  },
+  {
+    "name" : "number_key",
+    "data" : "1234567890123456"
+  }
+]
+```
+        
+The _name_ property of a key could be anything. The _name_ property is matched against the value of the "token_service" parameter that services provide when requesting authorization. For example, `https://cas.example.com/?token_service=number_key&auth_token=…` will attempt to use the above "number_key" to decrypt the given "auth_token".
+
+The _data_ property is the AES128 key that will be used to decrypt the provided token.  The key must be **EXACTLY** 16 characters
         
 ### Configure Attribute Population and Repository
 To convert the profile data received from the decrypted token, configure the `authenticationMetaDataPopulators` property on the `authenticationManager` bean:
