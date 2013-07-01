@@ -114,16 +114,23 @@ public class Token {
   private void decryptData() throws Exception {
     byte[] output = null;
 
+    byte[] rawData = Base64.decodeBase64(this.tokenData);
+    byte[] iv = new byte[16];
+    byte[] cipherText = new byte[rawData.length - iv.length];
+
+    System.arraycopy(rawData, 0, iv, 0, 16);
+    System.arraycopy(rawData, 16, cipherText, 0, cipherText.length);
+
     try {
       log.debug(
           "Decrypting token with key = `{}`",
           new String(this.key.data())
       );
       SecretKeySpec skey = new SecretKeySpec(this.key.data(), "AES");
-      Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-      cipher.init(Cipher.DECRYPT_MODE, skey);
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      cipher.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(iv));
 
-      output = cipher.doFinal(Base64.decodeBase64(this.tokenData));
+      output = cipher.doFinal(cipherText);
       JSONObject jsonObject = new JSONObject(new String(output));
       log.debug("Decrypted token:");
       log.debug(jsonObject.toString());

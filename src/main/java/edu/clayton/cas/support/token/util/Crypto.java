@@ -9,6 +9,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class Crypto {
   /**
@@ -33,10 +34,25 @@ public class Crypto {
     String encryptedString;
 
     byte[] encryptedStringData;
+    
+    //Create a random initialization vector
+    SecureRandom random = new SecureRandom();
+    byte[] randBytes = new byte[16];
+    random.nextBytes(randBytes);
+    IvParameterSpec iv = new IvParameterSpec(randBytes);
+
     SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
-    Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-    cipher.init(Cipher.ENCRYPT_MODE, skey);
-    encryptedStringData = cipher.doFinal(string.getBytes());
+    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    cipher.init(Cipher.ENCRYPT_MODE, skey, iv);
+
+    byte[] ivBytes = iv.getIV();
+    byte[] inputBytes = string.getBytes();
+    byte[] plaintext = new byte[ivBytes.length + inputBytes.length];
+
+    System.arraycopy(ivBytes, 0, plaintext, 0, ivBytes.length);
+    System.arraycopy(inputBytes, 0, plaintext, ivBytes.length, inputBytes.length);
+    
+    encryptedStringData = cipher.doFinal(plaintext);
     encryptedString = Base64.encodeBase64String(encryptedStringData);
 
     return encryptedString;
@@ -64,10 +80,17 @@ public class Crypto {
     String decryptedString;
 
     byte[] decryptedStringData;
+    byte[] rawData = Base64.decodeBase64(string);
+    byte[] iv = new byte[16];
+    byte[] cipherText = new byte[rawData.length - iv.length];
+
+    System.arraycopy(rawData, 0, iv, 0, 16);
+    System.arraycopy(rawData, 16, cipherText, 0, cipherText.length);
+    
     SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
-    Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-    cipher.init(Cipher.DECRYPT_MODE, skey);
-    decryptedStringData = cipher.doFinal(Base64.decodeBase64(string));
+    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    cipher.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(iv));
+    decryptedStringData = cipher.doFinal(cipherText);
     decryptedString = new String(decryptedStringData);
 
     return decryptedString;
