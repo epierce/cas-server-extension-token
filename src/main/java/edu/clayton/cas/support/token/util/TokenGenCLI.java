@@ -9,6 +9,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -90,6 +91,8 @@ public class TokenGenCLI {
     } catch (InvalidKeyException e) {
       e.printStackTrace();
     } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    } catch (InvalidAlgorithmParameterException e) {
       e.printStackTrace();
     }
   }
