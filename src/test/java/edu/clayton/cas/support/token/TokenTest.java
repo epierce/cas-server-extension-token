@@ -1,13 +1,11 @@
 package edu.clayton.cas.support.token;
 
 import edu.clayton.cas.support.token.keystore.Key;
-import org.apache.commons.codec.binary.Base64;
+import edu.clayton.cas.support.token.util.Crypto;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -36,12 +34,10 @@ public class TokenTest {
     tokenData.put("generated", this.generatedTime);
     tokenData.put("credentials", new JSONObject(new String(buffer)));
 
-    byte[] encryptedTokenData;
-    SecretKeySpec skey = new SecretKeySpec(this.serverKey.data(), "AES");
-    Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-    cipher.init(Cipher.ENCRYPT_MODE, skey);
-    encryptedTokenData = cipher.doFinal(tokenData.toString().getBytes());
-    this.b64tokenData = Base64.encodeBase64String(encryptedTokenData);
+    this.b64tokenData = Crypto.encryptWithKey(
+        tokenData.toString(),
+        new String(this.serverKey.data())
+    );
   }
 
   @Test
