@@ -14,9 +14,10 @@ import static org.junit.Assert.assertTrue;
 
 public class TokenAuthenticationHandlerTest {
   private String b64Token =
-      "iLqtjso73xuX6Z1rmkvJ2cgvgWgPqpEeRDg4tRsPachItOgH5ehHBbd93js1kgi5jJ29f57Wa7r8\n" +
-      "Tq/jl0Mis+bAWdOJMXvmqPq68RlScuBbsAMs6488rntGILGRqsc+YK8Q+VKGvx9tBqZmRjUfcDBY\n" +
-      "YieGnGqxysiX2vAhKztLTX+RwBMnwjCpSLXl5+Ja5mDdxfGaA8N+1ZaaNGVffw==";
+      "9WV+J40K+tfISLlliYwx320WrfUpfkPN2uCelSOxaN+JgfdPSr9E4qYTbvei0mmEXcUNczygVbW6\n" +
+      "Qk8BpsMPqTnos9TWx8NPLKk1ghykEES1gOVCcUzMqx4C+0sFbUsSs3Ory8KBjNzM/eAv0Cd0ZKnn\n" +
+      "mbo5Y94Pl+ZQzDd+sWCBD3swENa018rNyQ1IGVbYHRbooJvtfsY/aJu+GPkL3+zE4YxKYnBZYqxV\n" +
+      "d7+T4iE=";
 
   private TokenAuthenticationHandler handler;
   private TokenCredentials validCredentials;
@@ -26,12 +27,12 @@ public class TokenAuthenticationHandlerTest {
   public void setup() {
     this.handler = new TokenAuthenticationHandler();
     this.validCredentials = new TokenCredentials(
-        "auser",
+        "jsumners",
         this.b64Token,
         "alphabet_key"
     );
     this.invalidCredentials = new TokenCredentials(
-        "auser",
+        "jsumners",
         this.b64Token,
         "number_key"
     );
