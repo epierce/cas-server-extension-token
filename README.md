@@ -3,6 +3,9 @@
 This module allows you to authenticate and pass attributes for a user with a AES128-encrypted token instead of a password.   
 
 ## How is the token generated?
+
+#### Example code for generating authentication tokens in multiple languages is available in the [cas-token-auth-examples](https://github.com/epierce/cas-token-auth-examples) repository
+
 The token is a AES-128 encrypted JSON object:
 
 ```
@@ -18,8 +21,6 @@ The token is a AES-128 encrypted JSON object:
 ```
 
 The _generated_ field is the timestamp in milliseconds, this value is compared against the system time to verify the age of the token.  The _username_ value is also compared to the _username_ request parameter to ensure this token belongs to this user.
-
-### Example code for generating authentication tokens in multiple languages is available in the [https://github.com/epierce/cas-token-auth-examples](cas-token-auth-examples) repository
 
 ## Adding Token authentication support to CAS
 
