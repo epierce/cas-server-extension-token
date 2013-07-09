@@ -17,9 +17,7 @@ The token is a AES-128 encrypted JSON object:
 }
 ```
 
-The _generated_ field is the timestamp in milliseconds.  This value is compared against the system time to verify the age of the token.  The _username_ is also compared to the _username_ request value to ensure this token belongs to this user.
-
-To encrypt the token with Java or PHP, use [PHP-Java-AES-Encrypt](https://github.com/stevenholder/PHP-Java-AES-Encrypt)
+The _generated_ field is the timestamp in milliseconds, this value is compared against the system time to verify the age of the token.  The _username_ value is also compared to the _username_ request parameter to ensure this token belongs to this user.
 
 ### Example code for generating authentication tokens in multiple languages is available in the [https://github.com/epierce/cas-token-auth-examples](cas-token-auth-examples) repository
 
@@ -46,7 +44,7 @@ Add the following block to the `pom.xml` in your CAS overlay
 <dependency>
   <groupId>edu.usf.cims</groupId>
   <artifactId>cas-server-extension-token</artifactId>
-  <version>0.3</version>
+  <version>0.4</version>
 </dependency>
 ```
 
