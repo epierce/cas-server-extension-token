@@ -1,14 +1,12 @@
 package edu.clayton.cas.support.token;
 
 import edu.clayton.cas.support.token.keystore.Key;
+import edu.clayton.cas.support.token.util.Crypto;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
 
 /**
@@ -113,26 +111,16 @@ public class Token {
   }
 
   private void decryptData() throws Exception {
-    byte[] output = null;
-
-    byte[] rawData = Base64.decodeBase64(this.tokenData);
-    byte[] iv = new byte[16];
-    byte[] cipherText = new byte[rawData.length - iv.length];
-
-    System.arraycopy(rawData, 0, iv, 0, 16);
-    System.arraycopy(rawData, 16, cipherText, 0, cipherText.length);
-
     try {
       log.debug(
           "Decrypting token with key = `{}`",
           new String(this.key.data())
       );
-      SecretKeySpec skey = new SecretKeySpec(this.key.data(), "AES");
-      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-      cipher.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(iv));
-
-      output = cipher.doFinal(cipherText);
-      JSONObject jsonObject = new JSONObject(new String(output));
+      String decryptedString = Crypto.decryptEncodedStringWithKey(
+          this.tokenData,
+          this.key
+      );
+      JSONObject jsonObject = new JSONObject(decryptedString);
       log.debug("Decrypted token:");
       log.debug(jsonObject.toString());
 
