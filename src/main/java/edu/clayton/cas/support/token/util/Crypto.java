@@ -1,5 +1,6 @@
 package edu.clayton.cas.support.token.util;
 
+import edu.clayton.cas.support.token.keystore.Key;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,7 +125,7 @@ public class Crypto {
    * Decrypts a {@link Base64} encoded encrypted string.
    *
    * @param string The encoded string to decrypt.
-   * @param key The key to use for decryption.
+   * @param key The {@link Key} to use for decryption.
    * @return The decrypted string.
    * @throws NoSuchPaddingException
    * @throws NoSuchAlgorithmException
@@ -132,7 +133,7 @@ public class Crypto {
    * @throws BadPaddingException
    * @throws IllegalBlockSizeException
    */
-  public static String decryptEncodedStringWithKey(String string, String key)
+  public static String decryptEncodedStringWithKey(String string, Key key)
       throws NoSuchPaddingException,
       NoSuchAlgorithmException,
       InvalidKeyException,
@@ -142,20 +143,43 @@ public class Crypto {
   {
     String decryptedString;
 
+    log.debug("Base64 string = `{}`", string);
     byte[] decryptedStringData;
     byte[] rawData = Base64.decodeBase64(string);
     byte[] iv = new byte[16];
     byte[] cipherText = new byte[rawData.length - iv.length];
 
+    log.debug("iv = `{}`", Crypto.toHex(iv));
+    log.debug("cipherText.length = `{}`", cipherText.length);
+    log.debug("cipherText = \n{}", Crypto.toHex(cipherText));
+
     System.arraycopy(rawData, 0, iv, 0, 16);
     System.arraycopy(rawData, 16, cipherText, 0, cipherText.length);
     
-    SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
+    SecretKeySpec skey = new SecretKeySpec(key.data(), "AES");
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     cipher.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(iv));
     decryptedStringData = cipher.doFinal(cipherText);
     decryptedString = new String(decryptedStringData);
 
     return decryptedString;
+  }
+
+  /**
+   * Returns a hexadecimal {@link String} representation of
+   * a given @{code byte} array. Primarily used for debug
+   * logging.
+   *
+   * @param bytes The byte array to convert.
+   * @return The hexadecimal representation as a {@linkplain String}.
+   */
+  public static String toHex(byte[] bytes) {
+    StringBuffer buffer = new StringBuffer();
+
+    for (byte b : bytes) {
+      buffer.append(String.format("%02X", b));
+    }
+
+    return buffer.toString();
   }
 }
