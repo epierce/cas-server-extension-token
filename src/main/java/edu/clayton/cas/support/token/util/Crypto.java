@@ -149,12 +149,12 @@ public class Crypto {
     byte[] iv = new byte[16];
     byte[] cipherText = new byte[rawData.length - iv.length];
 
+    System.arraycopy(rawData, 0, iv, 0, 16);
+    System.arraycopy(rawData, 16, cipherText, 0, cipherText.length);
+
     log.debug("iv = `{}`", Crypto.toHex(iv));
     log.debug("cipherText.length = `{}`", cipherText.length);
     log.debug("cipherText = \n{}", Crypto.toHex(cipherText));
-
-    System.arraycopy(rawData, 0, iv, 0, 16);
-    System.arraycopy(rawData, 16, cipherText, 0, cipherText.length);
     
     SecretKeySpec skey = new SecretKeySpec(key.data(), "AES");
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
