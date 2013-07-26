@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +31,7 @@ import java.util.Map;
  */
 public final class TokenCredentials implements Credentials {
     
-  private static final long serialVersionUID = 2749515041385101769L;
+  private static final long serialVersionUID = 2749515041385101770L;
 
   private static final Logger logger = LoggerFactory.getLogger(TokenCredentials.class);
 
@@ -85,16 +84,7 @@ public final class TokenCredentials implements Credentials {
    */
   public void setUserAttributes(TokenAttributes userProfile) {
     Assert.notNull(userProfile);
-    this.userAttributes = new HashMap<String, Object>();
-    this.userAttributes.put("ProviderName", "UsfNetId");
-    this.userAttributes.put(
-        "DisplayName",
-        String.format("%s %s", userProfile.getFirstName(), userProfile.getLastName())
-    );
-    this.userAttributes.put("FamilyName", userProfile.getLastName());
-    this.userAttributes.put("GivenName", userProfile.getFirstName());
-    this.userAttributes.put("Email", userProfile.getEmail());
-    this.userAttributes.put("PreferredUsername", userProfile.getUsername());
+    this.userAttributes = userProfile;
   }
 
   public String toString() {

@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>A {@linkplain Token} is derived from data received from a client. This
@@ -42,6 +44,8 @@ public class Token {
 
   private long generated;
   private TokenAttributes attributes;
+  private List requiredTokenAttributes;
+  private Map tokenAttributesMap;
 
   /**
    * Initializes a {@linkplain Token} object from a
@@ -49,7 +53,8 @@ public class Token {
    *
    * @param data The data to decode into a {@linkplain Token}.
    */
-  public Token(String data) {
+  public Token(String data)
+  {
     this.tokenData = data;
   }
 
@@ -110,6 +115,14 @@ public class Token {
     this.key = key;
   }
 
+  public void setRequiredTokenAttributes(List requiredTokenAttributes) {
+    this.requiredTokenAttributes = requiredTokenAttributes;
+  }
+
+  public void setTokenAttributesMap(Map tokenAttributesMap) {
+    this.tokenAttributesMap = tokenAttributesMap;
+  }
+
   private void decryptData() throws Exception {
     try {
       log.debug(
@@ -126,7 +139,9 @@ public class Token {
 
       this.generated = jsonObject.getLong("generated");
       this.attributes = new TokenAttributes(
-          jsonObject.getJSONObject("credentials").toString()
+          jsonObject.getJSONObject("credentials").toString(),
+          this.requiredTokenAttributes,
+          this.tokenAttributesMap
       );
       this.isDecoded = true;
 
