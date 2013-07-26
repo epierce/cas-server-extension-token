@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This handler authenticates token credentials 
@@ -38,6 +40,12 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
 
   /** An instance of a {@link edu.clayton.cas.support.token.keystore.Keystore}. **/
   private Keystore keystore;
+
+  /** A list of required attributes that will be passed along to the {@link edu.clayton.cas.support.token.TokenAttributes} instance. **/
+  private List requiredTokenAttributes;
+
+  /** A map of attribute names to {@link edu.clayton.cas.support.token.TokenAttributes} properties that will be passed along. **/
+  private Map tokenAttributesMap;
 
   /* Maximum amount of time (before or after current time) that the 'generated' parameter 
    * in the supplied token can differ from the server */
@@ -62,6 +70,8 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     // Configure the credential's token so that it can be decrypted.
     Token token = credential.getToken();
     token.setKey(apiKey);
+    token.setRequiredTokenAttributes(this.requiredTokenAttributes);
+    token.setTokenAttributesMap(this.tokenAttributesMap);
     credential.setToken(token);
 
     try {
@@ -71,8 +81,10 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
       throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.key");
     }
 
+    // This username was given in the request URL.
     String credUsername = credential.getUsername();
-    String attrUsername = (String) credential.getUserAttributes().get("PreferredUsername");
+    // This username is from the decrypted token.
+    String attrUsername = credential.getToken().getAttributes().getUsername();
 
     log.debug("Got username from token : {}", credUsername);
 
@@ -103,5 +115,12 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
   public final void setMaxDrift(final int maxDrift){
     this.maxDrift = maxDrift;
   }
-    
+
+  public final void setRequiredTokenAttributes(final List requiredTokenAttributes) {
+    this.requiredTokenAttributes = requiredTokenAttributes;
+  }
+
+  public final void setTokenAttributesMap(final Map tokenAttributesMap) {
+    this.tokenAttributesMap = tokenAttributesMap;
+  }
 }
