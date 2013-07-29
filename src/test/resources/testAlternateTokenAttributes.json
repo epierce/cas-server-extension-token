@@ -1,0 +1,6 @@
+{
+  "sAMAccountName" : "auser",
+  "givenName" : "Foo",
+  "sn" : "Bar",
+  "mail" : "foobar@example.com"
+}

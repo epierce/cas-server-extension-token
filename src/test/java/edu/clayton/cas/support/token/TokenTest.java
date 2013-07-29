@@ -55,5 +55,8 @@ public class TokenTest {
     assertTrue("Foo".equals(tokenAttributes.getFirstName()));
     assertTrue("Bar".equals(tokenAttributes.getLastName()));
     assertTrue("foobar@example.com".equals(tokenAttributes.getEmail()));
+
+    tokenAttributes.put("answer", 42);
+    assertEquals(42, tokenAttributes.get("answer"));
   }
 }
