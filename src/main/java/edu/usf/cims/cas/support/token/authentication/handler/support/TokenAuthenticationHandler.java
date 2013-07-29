@@ -81,6 +81,11 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
       throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.key");
     }
 
+    if (!token.getAttributes().isValid()) {
+      log.warn("Invalid token attributes detected.");
+      throw new BadCredentialsAuthenticationException("error.authentication.credentials.missing.required.attributes");
+    }
+
     // This username was given in the request URL.
     String credUsername = credential.getUsername();
     // This username is from the decrypted token.
