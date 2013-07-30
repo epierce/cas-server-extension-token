@@ -47,7 +47,7 @@ Add the following block to the `pom.xml` in your CAS overlay
 <dependency>
   <groupId>edu.usf.cims</groupId>
   <artifactId>cas-server-extension-token</artifactId>
-  <version>0.5</version>
+  <version>0.6.0-SNAPSHOT</version>
 </dependency>
 ```
 
