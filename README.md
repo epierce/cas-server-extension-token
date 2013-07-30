@@ -47,7 +47,7 @@ Add the following block to the `pom.xml` in your CAS overlay
 <dependency>
   <groupId>edu.usf.cims</groupId>
   <artifactId>cas-server-extension-token</artifactId>
-  <version>0.4</version>
+  <version>0.5</version>
 </dependency>
 ```
 
@@ -199,4 +199,4 @@ To define the `tokenAuthAction` bean, add it to `cas-servlet.xml`:
 <bean id="tokenAuthAction" class="edu.usf.cims.cas.support.token.web.flow.TokenAuthAction">
   <property name="centralAuthenticationService" ref="centralAuthenticationService" />
 </bean>
-``
+```
