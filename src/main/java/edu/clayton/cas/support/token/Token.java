@@ -1,15 +1,15 @@
 package edu.clayton.cas.support.token;
 
 import edu.clayton.cas.support.token.keystore.Key;
+import edu.clayton.cas.support.token.util.Crypto;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>A {@linkplain Token} is derived from data received from a client. This
@@ -44,6 +44,8 @@ public class Token {
 
   private long generated;
   private TokenAttributes attributes;
+  private List requiredTokenAttributes;
+  private Map tokenAttributesMap;
 
   /**
    * Initializes a {@linkplain Token} object from a
@@ -51,7 +53,8 @@ public class Token {
    *
    * @param data The data to decode into a {@linkplain Token}.
    */
-  public Token(String data) {
+  public Token(String data)
+  {
     this.tokenData = data;
   }
 
@@ -112,33 +115,33 @@ public class Token {
     this.key = key;
   }
 
+  public void setRequiredTokenAttributes(List requiredTokenAttributes) {
+    this.requiredTokenAttributes = requiredTokenAttributes;
+  }
+
+  public void setTokenAttributesMap(Map tokenAttributesMap) {
+    this.tokenAttributesMap = tokenAttributesMap;
+  }
+
   private void decryptData() throws Exception {
-    byte[] output = null;
-
-    byte[] rawData = Base64.decodeBase64(this.tokenData);
-    byte[] iv = new byte[16];
-    byte[] cipherText = new byte[rawData.length - iv.length];
-
-    System.arraycopy(rawData, 0, iv, 0, 16);
-    System.arraycopy(rawData, 16, cipherText, 0, cipherText.length);
-
     try {
       log.debug(
           "Decrypting token with key = `{}`",
           new String(this.key.data())
       );
-      SecretKeySpec skey = new SecretKeySpec(this.key.data(), "AES");
-      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-      cipher.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(iv));
-
-      output = cipher.doFinal(cipherText);
-      JSONObject jsonObject = new JSONObject(new String(output));
+      String decryptedString = Crypto.decryptEncodedStringWithKey(
+          this.tokenData,
+          this.key
+      );
+      JSONObject jsonObject = new JSONObject(decryptedString);
       log.debug("Decrypted token:");
       log.debug(jsonObject.toString());
 
       this.generated = jsonObject.getLong("generated");
       this.attributes = new TokenAttributes(
-          jsonObject.getJSONObject("credentials").toString()
+          jsonObject.getJSONObject("credentials").toString(),
+          this.requiredTokenAttributes,
+          this.tokenAttributesMap
       );
       this.isDecoded = true;
 
