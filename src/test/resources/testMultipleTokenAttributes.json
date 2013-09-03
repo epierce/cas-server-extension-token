@@ -1,0 +1,7 @@
+{
+  "username" : "auser",
+  "firstname" : "Foo",
+  "lastname" : "Bar",
+  "email" : "foobar@example.com",
+  "multiple" : ["one", "two", "three"]
+}

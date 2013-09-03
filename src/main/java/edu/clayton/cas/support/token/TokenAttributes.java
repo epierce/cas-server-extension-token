@@ -2,12 +2,14 @@ package edu.clayton.cas.support.token;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -51,13 +53,26 @@ public class TokenAttributes extends ConcurrentHashMap<String, Object> {
       String[] keys = JSONObject.getNames(jsonObject);
 
       for (String k : keys) {
-        this.put(k, jsonObject.get(k));
+        Object entry = jsonObject.get(k);
+        if (entry instanceof JSONArray) {
+          this.put(k, toList( (JSONArray) entry));
+        } else {
+          this.put(k, entry.toString());
+        } 
       }
 
     } catch (JSONException e) {
       log.error("Could not parse TokenAttributes data!");
       log.debug(e.toString());
     }
+  }
+
+  private List toList(JSONArray array) throws JSONException {
+    List list = new ArrayList();
+    for (int i = 0; i < array.length(); i++) {
+      list.add(array.get(i).toString());
+    }
+    return list;
   }
 
   /**
