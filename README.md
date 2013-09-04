@@ -29,28 +29,15 @@ All properties of the _credentials_ object will be available to the CAS attribut
 ### Use the Maven Overlay Method for configuring CAS
 The wiki article on how to configure it is [here](https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method)
 
-### Add the Maven dependency and the Sonatype repositories
-Add the following blocks to the `pom.xml` in your CAS overlay
+### Add the Maven dependency
+Add the following block to the `pom.xml` in your CAS overlay
 
 ```
 <dependency>
   <groupId>edu.usf.cims</groupId>
   <artifactId>cas-server-extension-token</artifactId>
-  <version>0.6.0</version>
+  <version>0.7.0-SNAPSHOT</version>
 </dependency>
-```
-
-```
-<repositories>
-  <repository>
-    <id>sonatype</id>
-    <url>http://oss.sonatype.org/content/repositories/releases/ </url>
-  </repository>
-  <repository>
-    <id>snapshots</id>
-    <url>https://oss.sonatype.org/content/repositories/snapshots/ </url>
-  </repository>
-</repositories>
 ```
 
 ### Configure Authentication
