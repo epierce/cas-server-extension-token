@@ -45,6 +45,20 @@ public class TokenAttributesTest {
   }
 
   @Test
+  public void multipleAttributes() throws Exception {
+    log.info("Checking multiple values in an attribute");
+
+    this.readJSON("testMultipleTokenAttributes.json");
+    TokenAttributes tokenAttributes = new TokenAttributes(this.json);
+
+    assertTrue("auser".equals(tokenAttributes.getUsername()));
+    assertTrue("Foo".equals(tokenAttributes.getFirstName()));
+    assertTrue("Bar".equals(tokenAttributes.getLastName()));
+    assertTrue("foobar@example.com".equals(tokenAttributes.getEmail()));
+    assertTrue("[one, two, three]".equals(tokenAttributes.get("multiple").toString()));
+  }
+
+  @Test
   public void alternateAttributes() throws Exception {
     log.info("Checking an alternate attributes object");
 
