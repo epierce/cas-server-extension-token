@@ -65,7 +65,7 @@ public class JSONKeystore implements Keystore {
    * Retrieve a named key from the keystore.
    *
    * @param name The name of the {@linkplain Key}.
-   * @return
+   * @return Key
    */
   public Key getKeyNamed(String name) {
     return this.keys.get(name);

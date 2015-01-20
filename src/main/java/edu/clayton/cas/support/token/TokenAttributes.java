@@ -67,8 +67,8 @@ public class TokenAttributes extends ConcurrentHashMap<String, Object> {
     }
   }
 
-  private List toList(JSONArray array) throws JSONException {
-    List list = new ArrayList();
+  private List<String> toList(JSONArray array) throws JSONException {
+    List<String> list = new ArrayList<String>();
     for (int i = 0; i < array.length(); i++) {
       list.add(array.get(i).toString());
     }

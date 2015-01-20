@@ -59,7 +59,7 @@
 
     <properties>
         <cas.version>4.1.0-SNAPSHOT</cas.version>
-        <json.version>20141113</json.version>
+        <json.version>20090211</json.version>
         <servlet.version>2.5</servlet.version>
         <junit.version>4.11</junit.version>
         <logback.version>1.0.13</logback.version>
@@ -132,6 +132,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>

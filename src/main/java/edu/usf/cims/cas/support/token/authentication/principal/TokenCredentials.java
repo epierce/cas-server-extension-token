@@ -83,7 +83,7 @@ public final class TokenCredentials implements Credential {
   /**
    * Create a map of the user's attributes for use by the CAS server classes.
    *
-   * @param userProfile The {@link }
+   * @param userProfile The TokenAttributes
    */
   public void setUserAttributes(TokenAttributes userProfile) {
     Assert.notNull(userProfile);

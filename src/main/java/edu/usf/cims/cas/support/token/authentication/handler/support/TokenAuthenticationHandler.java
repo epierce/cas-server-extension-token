@@ -124,11 +124,11 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     this.maxDrift = maxDrift;
   }
 
-  public final void setRequiredTokenAttributes(final List requiredTokenAttributes) {
+  public final void setRequiredTokenAttributes(final List<String> requiredTokenAttributes) {
     this.requiredTokenAttributes = requiredTokenAttributes;
   }
 
-  public final void setTokenAttributesMap(final Map tokenAttributesMap) {
+  public final void setTokenAttributesMap(final Map<String,String> tokenAttributesMap) {
     this.tokenAttributesMap = tokenAttributesMap;
   }
 }
