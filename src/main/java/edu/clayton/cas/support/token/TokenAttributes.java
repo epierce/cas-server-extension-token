@@ -40,7 +40,7 @@ public class TokenAttributes extends ConcurrentHashMap<String, Object> {
    * @param requiredTokenAttributes A list of required attribute names.
    * @param tokenAttributesMap A map that maps incoming attribute names to properties of this object.
    */
-  public TokenAttributes(String data, List requiredTokenAttributes, Map tokenAttributesMap)
+  public TokenAttributes(String data, List<String> requiredTokenAttributes, Map<String,String> tokenAttributesMap)
   {
     Assert.notNull(data);
     this.requiredTokenAttributes = requiredTokenAttributes;

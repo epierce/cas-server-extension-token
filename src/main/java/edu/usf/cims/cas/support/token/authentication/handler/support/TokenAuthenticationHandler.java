@@ -45,10 +45,10 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
   private Keystore keystore;
 
   /** A list of required attributes that will be passed along to the {@link edu.clayton.cas.support.token.TokenAttributes} instance. **/
-  private List requiredTokenAttributes;
+  private List<String> requiredTokenAttributes;
 
   /** A map of attribute names to {@link edu.clayton.cas.support.token.TokenAttributes} properties that will be passed along. **/
-  private Map tokenAttributesMap;
+  private Map<String,String> tokenAttributesMap;
 
   /* Maximum amount of time (before or after current time) that the 'generated' parameter 
    * in the supplied token can differ from the server */

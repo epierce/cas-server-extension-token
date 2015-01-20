@@ -44,8 +44,8 @@ public class Token {
 
   private long generated;
   private TokenAttributes attributes;
-  private List requiredTokenAttributes;
-  private Map tokenAttributesMap;
+  private List<String> requiredTokenAttributes;
+  private Map<String,String> tokenAttributesMap;
 
   /**
    * Initializes a {@linkplain Token} object from a
@@ -115,11 +115,11 @@ public class Token {
     this.key = key;
   }
 
-  public void setRequiredTokenAttributes(List requiredTokenAttributes) {
+  public void setRequiredTokenAttributes(List<String> requiredTokenAttributes) {
     this.requiredTokenAttributes = requiredTokenAttributes;
   }
 
-  public void setTokenAttributesMap(Map tokenAttributesMap) {
+  public void setTokenAttributesMap(Map<String,String> tokenAttributesMap) {
     this.tokenAttributesMap = tokenAttributesMap;
   }
 

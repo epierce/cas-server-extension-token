@@ -57,17 +57,6 @@ To authenticate using a token, add the `TokenAuthenticationHandler` bean to the 
     
 * **maxDrift**: Number of seconds (+/-) to allow for clock drift  when validating the timestamp of the token.
 
-You'll also need to add `TokenCredentialsToPrincipalResolver` to the list of principal resolvers:
-
-```
-<property name="credentialsToPrincipalResolvers">
-  <list>
-    <bean class="edu.usf.cims.cas.support.token.authentication.principal.TokenCredentialsToPrincipalResolver" />  
-    <bean class="org.jasig.cas.authentication.principal.HttpBasedServiceCredentialsToPrincipalResolver" />
-  </list>
-</property>
-```
-
 Finally, define the following bean (to load a `keystore.json` file from `/WEB-INF/classes/`):
 
 ```
@@ -144,17 +133,7 @@ This bean defines a mapping from the attributes in the _credentials_ object to t
 It is recommended that you define this bean if you use anything other than the default attributes. However, it is only required if your are defining an alternate property name for "username".
         
 ### Configure Attribute Population and Repository
-To convert the profile data received from the decrypted token, configure the `authenticationMetaDataPopulators` property on the `authenticationManager` bean:
-
-```
-<property name="authenticationMetaDataPopulators">
-  <list>
-    <bean class="edu.usf.cims.cas.support.token.authentication.TokenAuthenticationMetaDataPopulator" />
-  </list>
-</property>
-```
-
-You'll also need to configure the `attributeRepository` bean:
+You'll need to configure the `attributeRepository` bean:
 
 ``` 
 <bean id="attributeRepository" 
