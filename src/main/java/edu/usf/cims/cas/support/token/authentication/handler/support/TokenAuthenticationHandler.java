@@ -18,12 +18,15 @@ import edu.clayton.cas.support.token.Token;
 import edu.clayton.cas.support.token.keystore.Key;
 import edu.clayton.cas.support.token.keystore.Keystore;
 import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
-import org.jasig.cas.authentication.handler.AuthenticationException;
-import org.jasig.cas.authentication.handler.BadCredentialsAuthenticationException;
 import org.jasig.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;
-import org.jasig.cas.authentication.principal.Credentials;
+import org.jasig.cas.authentication.Credential;
+import org.jasig.cas.authentication.HandlerResult;
+import org.jasig.cas.authentication.BasicCredentialMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.jasig.cas.authentication.PreventedException;
+import java.security.GeneralSecurityException;
 
 import java.util.Date;
 import java.util.List;
@@ -51,20 +54,19 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
    * in the supplied token can differ from the server */
   private int maxDrift;
 
-  public boolean supports(Credentials credentials) {
-      return credentials != null && (TokenCredentials.class.isAssignableFrom(credentials.getClass()));
+  public boolean supports(Credential credential) {
+      return credential != null && (TokenCredentials.class.isAssignableFrom(credential.getClass()));
   }
     
   @Override
-  protected boolean doAuthentication(Credentials credentials) throws AuthenticationException {
-    boolean result = false;
-    TokenCredentials credential = (TokenCredentials) credentials;
+  protected HandlerResult doAuthentication(Credential myCredential) throws GeneralSecurityException, PreventedException {
+    TokenCredentials credential = (TokenCredentials) myCredential;
 
     // Check to see if the api_key is allowed.
     Key apiKey = this.keystore.getKeyNamed(credential.getTokenService());
     if (apiKey == null) {
-      log.warn("API key not found in keystore!");
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.apikey");
+      log.error("API key not found in keystore!");
+      throw new GeneralSecurityException("error.authentication.credentials.bad.token.apikey");
     }
 
     // Configure the credential's token so that it can be decrypted.
@@ -78,12 +80,12 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
       credential.setUserAttributes(token.getAttributes());
     } catch (Exception e) {
       log.warn("Could not decrypt token!");
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.key");
+      throw new GeneralSecurityException("error.authentication.credentials.bad.token.key");
     }
 
     if (!token.getAttributes().isValid()) {
       log.warn("Invalid token attributes detected.");
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.missing.required.attributes");
+      throw new GeneralSecurityException("error.authentication.credentials.missing.required.attributes");
     }
 
     // This username was given in the request URL.
@@ -99,18 +101,19 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
 
     if (genTimeDiff > this.maxDrift) {
       log.warn("Authentication Error: Token expired for {}", credUsername);
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.expired");
+      throw new GeneralSecurityException("error.authentication.credentials.bad.token.expired");
     }
 
     if (attrUsername.equals(credUsername)) {
       log.debug("Authentication Success");
-      result = true;
+      return new HandlerResult(
+              this,
+              new BasicCredentialMetaData(credential),
+              this.principalFactory.createPrincipal(credential.getId(), credential.getUserAttributes()));
     } else {
       log.error("Authentication Error: Client passed username [{}], token generated for [{}]", credUsername, attrUsername);
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.username");
+      throw new GeneralSecurityException("error.authentication.credentials.bad.token.username");
     }
-
-    return result;
   }
 
   public final void setKeystore(final Keystore keystore) {

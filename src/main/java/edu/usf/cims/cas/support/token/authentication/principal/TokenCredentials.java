@@ -16,7 +16,7 @@ package edu.usf.cims.cas.support.token.authentication.principal;
 
 import edu.clayton.cas.support.token.Token;
 import edu.clayton.cas.support.token.TokenAttributes;
-import org.jasig.cas.authentication.principal.Credentials;
+import org.jasig.cas.authentication.Credential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -29,7 +29,7 @@ import java.util.Map;
  * @author Eric Pierce
  * @since 0.1
  */
-public final class TokenCredentials implements Credentials {
+public final class TokenCredentials implements Credential {
     
   private static final long serialVersionUID = 2749515041385101770L;
 
@@ -76,6 +76,9 @@ public final class TokenCredentials implements Credentials {
     return this.userAttributes;
   }
 
+  public final String getId() {
+    return this.username;
+  }
 
   /**
    * Create a map of the user's attributes for use by the CAS server classes.
