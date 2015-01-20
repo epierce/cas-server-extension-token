@@ -15,10 +15,9 @@
 package edu.usf.cims.cas.support.token.web.flow;
 
 import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jasig.cas.CentralAuthenticationService;
 import org.jasig.cas.authentication.principal.Service;
-import org.jasig.cas.ticket.TicketException;
 import org.jasig.cas.web.support.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +31,8 @@ import javax.validation.constraints.NotNull;
 import java.lang.String;
 
 /**
- * This class represents an action in the webflow to retrieve user information from an AES128 encrypted token. If the auth_token 
- * parameter exists in the web request, it is used to create a new TokenCredential.
+ * This class represents an action in the webflow to retrieve user information from an AES128 encrypted token. If the
+ * auth_token parameter exists in the web request, it is used to create a new TokenCredential.
  * 
  * @author Eric Pierce
  * @since 0.1
@@ -78,10 +77,10 @@ public final class TokenAuthAction extends AbstractAction {
       session.setAttribute("service", service);
                  
       try {
-        WebUtils.putTicketGrantingTicketInRequestScope(context, this.centralAuthenticationService
+        WebUtils.putTicketGrantingTicketInScopes(context, this.centralAuthenticationService
                 .createTicketGrantingTicket(credential));
         return success();
-      } catch (final TicketException e) {
+      } catch (final Exception e) {
         return error();
       }
     } 
