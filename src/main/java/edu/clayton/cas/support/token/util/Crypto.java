@@ -21,20 +21,20 @@ public class Crypto {
 
   /**
    * Returns an ASCII string that can be used for encrypting/decrypting
-   * data with the AES-128 algorithm. The given seed <strong>does not</strong>
+   * data with the AES-256 algorithm. The given seed <strong>does not</strong>
    * guarantee the same result for subsequent invocations.
    *
    * @param seed A string to seed the generator with.
-   * @return A unique ASCII string that can be used as an AES-128 key, or null.
+   * @return A unique ASCII string that can be used as an AES-256 key, or null.
    */
-  public static String generateAes128KeyWithSeed(String seed) {
+  public static String generateAes256KeyWithSeed(String seed) {
     String returnKey = null;
 
     try {
       SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
-      byte[] salt = new byte[16];
+      byte[] salt = new byte[32];
       rand.nextBytes(salt);
-      PBEKeySpec password = new PBEKeySpec(seed.toCharArray(), salt, 1000, 128);
+      PBEKeySpec password = new PBEKeySpec(seed.toCharArray(), salt, 1000, 256);
       SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
       PBEKey key = (PBEKey) factory.generateSecret(password);
       SecretKey secretKey = new SecretKeySpec(key.getEncoded(), "AES");
@@ -64,7 +64,7 @@ public class Crypto {
       }
       returnKey = keyBuffer.toString();
     } catch (InvalidKeySpecException e) {
-      log.error("Could not find desired key specificatio.");
+      log.error("Could not find desired key specification.");
       log.debug(e.toString());
     } catch (NoSuchAlgorithmException e) {
       log.error("Could not find encryption algorithm.");

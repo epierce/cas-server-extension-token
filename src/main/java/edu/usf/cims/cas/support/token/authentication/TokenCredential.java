@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 import java.util.Map;
 
 /**
- * This class creates a CAS-compatible credential using data from an AES128-encrypted token
+ * This class creates a CAS-compatible credential using data from an AES-256 encrypted token
  * 
  * @author Eric Pierce
  * @since 0.1
