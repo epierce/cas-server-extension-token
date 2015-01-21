@@ -29,11 +29,11 @@ import java.util.Map;
  * @author Eric Pierce
  * @since 0.1
  */
-public final class TokenCredentials implements Credential {
+public final class TokenCredential implements Credential {
     
-  private static final long serialVersionUID = 2749515041385101770L;
+  private static final long serialVersionUID = 2749515041385101771L;
 
-  private static final Logger logger = LoggerFactory.getLogger(TokenCredentials.class);
+  private static final Logger logger = LoggerFactory.getLogger(TokenCredential.class);
 
   private Token token;
 
@@ -43,7 +43,7 @@ public final class TokenCredentials implements Credential {
 
   private Map<String, Object> userAttributes;
 
-  public TokenCredentials(final String username, final String token, final String tokenService) {
+  public TokenCredential(final String username, final String token, final String tokenService) {
     Assert.notNull(token, "token cannot be null");
     Assert.notNull(username, "username cannot be null");
     Assert.notNull(tokenService, "tokenService cannot be null");

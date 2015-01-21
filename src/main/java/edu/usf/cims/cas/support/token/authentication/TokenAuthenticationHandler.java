@@ -53,12 +53,12 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
   private int maxDrift;
 
   public boolean supports(Credential credential) {
-      return credential != null && (TokenCredentials.class.isAssignableFrom(credential.getClass()));
+      return credential != null && (TokenCredential.class.isAssignableFrom(credential.getClass()));
   }
     
   @Override
   protected HandlerResult doAuthentication(Credential myCredential) throws GeneralSecurityException, PreventedException {
-    TokenCredentials credential = (TokenCredentials) myCredential;
+    TokenCredential credential = (TokenCredential) myCredential;
 
     // Check to see if the api_key is allowed.
     Key apiKey = this.keystore.getKeyNamed(credential.getTokenService());

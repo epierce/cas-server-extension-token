@@ -1,7 +1,6 @@
-package edu.usf.cims.cas.support.token.authentication.handler.support;
+package edu.usf.cims.cas.support.token.authentication;
 
 import edu.clayton.cas.support.token.keystore.JSONKeystore;
-import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
 import org.jasig.cas.authentication.HandlerResult;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +11,6 @@ import java.io.File;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TokenAuthenticationHandlerTest {
@@ -23,18 +21,18 @@ public class TokenAuthenticationHandlerTest {
                     "d7+T4iE=";
 
     private TokenAuthenticationHandler handler;
-    private TokenCredentials validCredentials;
-    private TokenCredentials invalidCredentials;
+    private TokenCredential validCredentials;
+    private TokenCredential invalidCredentials;
 
     @Before
     public void setup() {
         this.handler = new TokenAuthenticationHandler();
-        this.validCredentials = new TokenCredentials(
+        this.validCredentials = new TokenCredential(
                 "jsumners",
                 this.b64Token,
                 "alphabet_key"
         );
-        this.invalidCredentials = new TokenCredentials(
+        this.invalidCredentials = new TokenCredential(
                 "jsumners",
                 this.b64Token,
                 "number_key"

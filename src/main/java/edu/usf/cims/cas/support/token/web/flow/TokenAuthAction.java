@@ -14,7 +14,7 @@
 */
 package edu.usf.cims.cas.support.token.web.flow;
 
-import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
+import edu.usf.cims.cas.support.token.authentication.TokenCredential;
 import org.apache.commons.lang3.StringUtils;
 import org.jasig.cas.CentralAuthenticationService;
 import org.jasig.cas.authentication.principal.Service;
@@ -70,7 +70,7 @@ public final class TokenAuthAction extends AbstractAction {
 
       // get credential
       @SuppressWarnings("unchecked")
-      TokenCredentials credential = new TokenCredentials(username, authTokenValue, tokenService);
+      TokenCredential credential = new TokenCredential(username, authTokenValue, tokenService);
       
       // put service in session from flow scope
       Service service = (Service) context.getFlowScope().get("service");
