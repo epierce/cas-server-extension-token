@@ -1,4 +1,4 @@
-/* Copyright 2013 University of South Florida.
+/* Copyright 2015 University of South Florida.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -12,22 +12,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.usf.cims.cas.support.token.authentication.handler.support;
+package edu.usf.cims.cas.support.token.authentication;
 
 import edu.clayton.cas.support.token.Token;
 import edu.clayton.cas.support.token.keystore.Key;
 import edu.clayton.cas.support.token.keystore.Keystore;
-import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
-import org.jasig.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;
+import org.jasig.cas.authentication.BasicCredentialMetaData;
 import org.jasig.cas.authentication.Credential;
 import org.jasig.cas.authentication.HandlerResult;
-import org.jasig.cas.authentication.BasicCredentialMetaData;
+import org.jasig.cas.authentication.PreventedException;
+import org.jasig.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jasig.cas.authentication.PreventedException;
 import java.security.GeneralSecurityException;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
