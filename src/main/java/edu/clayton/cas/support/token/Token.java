@@ -104,6 +104,16 @@ public class Token {
   }
 
   /**
+   * Return the name of the key used to generate this token.  By convention, this is also an identifier for the
+   * application that generated the token.
+   *
+   * @return The key name
+   */
+  public String getKeyGenerator() {
+    return this.key.name();
+  }
+
+  /**
    * Define the crypto key that will be used to decode the {@linkplain Token}
    * data.
    *
@@ -149,5 +159,9 @@ public class Token {
       log.debug(e.toString());
       throw e;
     }
+  }
+
+  public String toString(){
+    return this.getKeyGenerator()+"["+this.getGenerated()+"]";
   }
 }
