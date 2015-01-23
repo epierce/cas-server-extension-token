@@ -15,8 +15,8 @@ import static org.junit.Assert.*;
 
 public class TokenTest {
   private String b64tokenData;
-  private Key serverKey = new Key("alphabet_key", "abcdefghijklmnop");
-  private Key clientKey = new Key("alphabet_key", "abcdefghijklmnop");
+  private Key serverKey = new Key("alphabet_key", "EKyrqGJnFQrUzohURXsJprFgBAKAPtrv");
+  private Key clientKey = new Key("alphabet_key", "EKyrqGJnFQrUzohURXsJprFgBAKAPtrv");
   private long generatedTime;
 
   @Before
@@ -34,10 +34,20 @@ public class TokenTest {
     tokenData.put("generated", this.generatedTime);
     tokenData.put("credentials", new JSONObject(new String(buffer)));
 
-    this.b64tokenData = Crypto.encryptWithKey(
-        tokenData.toString(),
-        new String(this.serverKey.data())
-    );
+    try {
+      this.b64tokenData = Crypto.encryptWithKey(
+              tokenData.toString(),
+              new String(this.clientKey.data())
+      );
+    // If we got an Invalid Key length exception, they need to download the JCE policy files
+    } catch (java.security.InvalidKeyException e) {
+      System.out.println("******************************************************************************************");
+      System.out.println("AES-256 is not supported on this system!");
+      System.out.println("You must install the JCE Unlimited Strength Jurisdiction Policy Files");
+      System.out.println("(http://www.oracle.com/technetwork/java/javase/downloads/index.html)");
+      System.out.println("It is the user's responsibility to verify that this action is permissible under local regulations.");
+      System.out.println("******************************************************************************************");
+    }
   }
 
   @Test

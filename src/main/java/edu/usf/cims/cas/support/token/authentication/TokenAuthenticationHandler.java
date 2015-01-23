@@ -77,12 +77,12 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     try {
       credential.setUserAttributes(token.getAttributes());
     } catch (Exception e) {
-      log.warn("Could not decrypt token!");
+      log.error("Could not decrypt token: " + e.getMessage());
       throw new GeneralSecurityException("error.authentication.credentials.bad.token.key");
     }
 
     if (!token.getAttributes().isValid()) {
-      log.warn("Invalid token attributes detected.");
+      log.error("Invalid token attributes detected.");
       throw new GeneralSecurityException("error.authentication.credentials.missing.required.attributes");
     }
 
@@ -98,7 +98,7 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     log.debug("Token generated {} seconds ago", genTimeDiff);
 
     if (genTimeDiff > this.maxDrift) {
-      log.warn("Authentication Error: Token expired for {}", credUsername);
+      log.error("Authentication Error: Token expired for {}", credUsername);
       throw new GeneralSecurityException("error.authentication.credentials.bad.token.expired");
     }
 

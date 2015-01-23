@@ -23,22 +23,19 @@ public class CryptoTest {
     log.info("Generated key is `{}`", key);
   }
 
+
   @Test
-  public void testEncryptWithKey() {
-    Key key = new Key("test", "12345678901234561234567890123456");
+  public void testEncryptWithKey() throws Exception {
+
+    Key key = new Key("test", "EBhfDjKZprGnfgMGrBMqHJXeDhUvKTox");
     String plaintext = "Mary had a little lamb.";
+    String cipherText = Crypto.encryptWithKey(plaintext, new String(key.data()));
+    String decrypted = Crypto.decryptEncodedStringWithKey(cipherText, key);
 
-    try {
-      String cipherText = Crypto.encryptWithKey(plaintext, new String(key.data()));
-      String decrypted = Crypto.decryptEncodedStringWithKey(cipherText, key);
+    assertNotEquals(plaintext, cipherText);
+    assertEquals(plaintext, decrypted);
 
-      assertNotEquals(plaintext, cipherText);
-      assertEquals(plaintext, decrypted);
 
-    } catch (Exception e){
-
-    }
   }
-
 
 }
