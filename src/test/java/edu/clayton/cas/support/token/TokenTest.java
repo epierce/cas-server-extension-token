@@ -53,6 +53,7 @@ public class TokenTest {
   @Test
   public void wholeShebang() {
     Token token = new Token(this.b64tokenData);
+    token.setUsernameAttribute("username");
 
     assertNull(token.getAttributes());
     assertEquals((new Date(0L)).getTime(), token.getGenerated());
@@ -62,9 +63,9 @@ public class TokenTest {
 
     assertEquals(this.generatedTime, token.getGenerated());
     assertTrue("auser".equals(tokenAttributes.getUsername()));
-    assertTrue("Foo".equals(tokenAttributes.getFirstName()));
-    assertTrue("Bar".equals(tokenAttributes.getLastName()));
-    assertTrue("foobar@example.com".equals(tokenAttributes.getEmail()));
+    assertTrue("Foo".equals(tokenAttributes.get("firstname")));
+    assertTrue("Bar".equals(tokenAttributes.get("lastname")));
+    assertTrue("foobar@example.com".equals(tokenAttributes.get("email")));
 
     tokenAttributes.put("answer", 42);
     assertEquals(42, tokenAttributes.get("answer"));

@@ -39,9 +39,9 @@ public class TokenAttributesTest {
     TokenAttributes tokenAttributes = new TokenAttributes(this.json);
 
     assertTrue("auser".equals(tokenAttributes.getUsername()));
-    assertTrue("Foo".equals(tokenAttributes.getFirstName()));
-    assertTrue("Bar".equals(tokenAttributes.getLastName()));
-    assertTrue("foobar@example.com".equals(tokenAttributes.getEmail()));
+    assertTrue("Foo".equals(tokenAttributes.get("firstname")));
+    assertTrue("Bar".equals(tokenAttributes.get("lastname")));
+    assertTrue("foobar@example.com".equals(tokenAttributes.get("email")));
   }
 
   @Test
@@ -52,44 +52,10 @@ public class TokenAttributesTest {
     TokenAttributes tokenAttributes = new TokenAttributes(this.json);
 
     assertTrue("auser".equals(tokenAttributes.getUsername()));
-    assertTrue("Foo".equals(tokenAttributes.getFirstName()));
-    assertTrue("Bar".equals(tokenAttributes.getLastName()));
-    assertTrue("foobar@example.com".equals(tokenAttributes.getEmail()));
+    assertTrue("Foo".equals(tokenAttributes.get("firstname")));
+    assertTrue("Bar".equals(tokenAttributes.get("lastname")));
+    assertTrue("foobar@example.com".equals(tokenAttributes.get("email")));
     assertTrue("[one, two, three]".equals(tokenAttributes.get("multiple").toString()));
-  }
-
-  @Test
-  public void alternateAttributes() throws Exception {
-    log.info("Checking an alternate attributes object");
-
-    // An Active Directory style attributes map.
-    this.readJSON("testAlternateTokenAttributes.json");
-    TokenAttributes tokenAttributes = new TokenAttributes(this.json);
-
-    ArrayList<String> requiredAttributes = new ArrayList<String>(2);
-    requiredAttributes.add("sAMAccountName");
-    requiredAttributes.add("mail");
-    tokenAttributes.setRequiredTokenAttributes(requiredAttributes);
-
-    log.info("Verifying required attributes are missing");
-    assertFalse(tokenAttributes.isValid());
-
-    log.info("Setting an attributes mapping");
-    HashMap<String, String> attributesMap = new HashMap<String, String>(4);
-    attributesMap.put("username", "sAMAccountName");
-    attributesMap.put("firstName", "givenName");
-    attributesMap.put("lastName", "sn");
-    attributesMap.put("email", "mail");
-    tokenAttributes.setTokenAttributesMap(attributesMap);
-
-    log.info("Verifying required attributes are now present");
-    assertTrue(tokenAttributes.isValid());
-
-    log.info("Verifying attributes are set correctly");
-    assertTrue("auser".equals(tokenAttributes.getUsername()));
-    assertTrue("Foo".equals(tokenAttributes.getFirstName()));
-    assertTrue("Bar".equals(tokenAttributes.getLastName()));
-    assertTrue("foobar@example.com".equals(tokenAttributes.getEmail()));
   }
 
   @Test
@@ -100,6 +66,6 @@ public class TokenAttributesTest {
     TokenAttributes tokenAttributes = new TokenAttributes(this.json);
 
     assertTrue("auser".equals(tokenAttributes.getUsername()));
-    assertNull(tokenAttributes.getFirstName());
+    assertNull(tokenAttributes.get("firstname"));
   }
 }

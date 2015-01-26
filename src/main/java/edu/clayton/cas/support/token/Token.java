@@ -43,7 +43,7 @@ public class Token {
   private long generated;
   private TokenAttributes attributes;
   private List<String> requiredTokenAttributes;
-  private Map<String,String> tokenAttributesMap;
+  private String usernameAttribute;
 
   /**
    * Initializes a {@linkplain Token} object from a
@@ -127,8 +127,8 @@ public class Token {
     this.requiredTokenAttributes = requiredTokenAttributes;
   }
 
-  public void setTokenAttributesMap(Map<String,String> tokenAttributesMap) {
-    this.tokenAttributesMap = tokenAttributesMap;
+  public void setUsernameAttribute(String attributeName) {
+    this.usernameAttribute = attributeName;
   }
 
   private void decryptData() throws Exception {
@@ -148,8 +148,8 @@ public class Token {
       this.generated = jsonObject.getLong("generated");
       this.attributes = new TokenAttributes(
           jsonObject.getJSONObject("credentials").toString(),
-          this.requiredTokenAttributes,
-          this.tokenAttributesMap
+          this.usernameAttribute,
+          this.requiredTokenAttributes
       );
       this.isDecoded = true;
 

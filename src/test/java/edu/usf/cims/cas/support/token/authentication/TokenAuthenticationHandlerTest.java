@@ -67,6 +67,7 @@ public class TokenAuthenticationHandlerTest {
 
         this.handler.setKeystore(jsonKeystore);
         this.handler.setMaxDrift(Integer.MAX_VALUE);
+        this.handler.setUsernameAttribute("username");
 
         HandlerResult result = this.handler.doAuthentication(this.validCredentials);
 
@@ -81,6 +82,7 @@ public class TokenAuthenticationHandlerTest {
 
         this.handler.setKeystore(jsonKeystore);
         this.handler.setMaxDrift(Integer.MAX_VALUE);
+        this.handler.setUsernameAttribute("username");
 
         this.handler.doAuthentication(this.invalidCredentials);
     }

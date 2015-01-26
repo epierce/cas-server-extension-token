@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This handler authenticates token credentials 
@@ -45,8 +44,7 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
   /** A list of required attributes that will be passed along to the {@link edu.clayton.cas.support.token.TokenAttributes} instance. **/
   private List<String> requiredTokenAttributes;
 
-  /** A map of attribute names to {@link edu.clayton.cas.support.token.TokenAttributes} properties that will be passed along. **/
-  private Map<String,String> tokenAttributesMap;
+  private String usernameAttribute;
 
   /* Maximum amount of time (before or after current time) that the 'generated' parameter 
    * in the supplied token can differ from the server */
@@ -71,7 +69,7 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     Token token = credential.getToken();
     token.setKey(apiKey);
     token.setRequiredTokenAttributes(this.requiredTokenAttributes);
-    token.setTokenAttributesMap(this.tokenAttributesMap);
+    token.setUsernameAttribute(this.usernameAttribute);
     credential.setToken(token);
 
     try {
@@ -91,7 +89,7 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     // This username is from the decrypted token.
     String attrUsername = credential.getToken().getAttributes().getUsername();
 
-    log.debug("Got username from token : {}", credUsername);
+    log.debug("Got username from token : {}", attrUsername);
 
     // Get the difference between the generated time and now.
     int genTimeDiff = Math.abs((int) (new Date().getTime() - token.getGenerated()) / 1000);
@@ -126,7 +124,7 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     this.requiredTokenAttributes = requiredTokenAttributes;
   }
 
-  public final void setTokenAttributesMap(final Map<String,String> tokenAttributesMap) {
-    this.tokenAttributesMap = tokenAttributesMap;
+  public final void setUsernameAttribute(final String attributeName) {
+    this.usernameAttribute = attributeName;
   }
 }
