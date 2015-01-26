@@ -1,4 +1,4 @@
-/* Copyright 2013 University of South Florida.
+/* Copyright 2015 University of South Florida.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -12,22 +12,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.usf.cims.cas.support.token.authentication.handler.support;
+package edu.usf.cims.cas.support.token.authentication;
 
 import edu.clayton.cas.support.token.Token;
 import edu.clayton.cas.support.token.keystore.Key;
 import edu.clayton.cas.support.token.keystore.Keystore;
-import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
-import org.jasig.cas.authentication.handler.AuthenticationException;
-import org.jasig.cas.authentication.handler.BadCredentialsAuthenticationException;
+import org.jasig.cas.authentication.BasicCredentialMetaData;
+import org.jasig.cas.authentication.Credential;
+import org.jasig.cas.authentication.HandlerResult;
+import org.jasig.cas.authentication.PreventedException;
 import org.jasig.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;
-import org.jasig.cas.authentication.principal.Credentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This handler authenticates token credentials 
@@ -42,48 +42,46 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
   private Keystore keystore;
 
   /** A list of required attributes that will be passed along to the {@link edu.clayton.cas.support.token.TokenAttributes} instance. **/
-  private List requiredTokenAttributes;
+  private List<String> requiredTokenAttributes;
 
-  /** A map of attribute names to {@link edu.clayton.cas.support.token.TokenAttributes} properties that will be passed along. **/
-  private Map tokenAttributesMap;
+  private String usernameAttribute;
 
   /* Maximum amount of time (before or after current time) that the 'generated' parameter 
    * in the supplied token can differ from the server */
   private int maxDrift;
 
-  public boolean supports(Credentials credentials) {
-      return credentials != null && (TokenCredentials.class.isAssignableFrom(credentials.getClass()));
+  public boolean supports(Credential credential) {
+      return credential != null && (TokenCredential.class.isAssignableFrom(credential.getClass()));
   }
     
   @Override
-  protected boolean doAuthentication(Credentials credentials) throws AuthenticationException {
-    boolean result = false;
-    TokenCredentials credential = (TokenCredentials) credentials;
+  protected HandlerResult doAuthentication(Credential myCredential) throws GeneralSecurityException, PreventedException {
+    TokenCredential credential = (TokenCredential) myCredential;
 
     // Check to see if the api_key is allowed.
     Key apiKey = this.keystore.getKeyNamed(credential.getTokenService());
     if (apiKey == null) {
-      log.warn("API key not found in keystore!");
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.apikey");
+      log.error("API key not found in keystore!");
+      throw new GeneralSecurityException("error.authentication.credentials.bad.token.apikey");
     }
 
     // Configure the credential's token so that it can be decrypted.
     Token token = credential.getToken();
     token.setKey(apiKey);
     token.setRequiredTokenAttributes(this.requiredTokenAttributes);
-    token.setTokenAttributesMap(this.tokenAttributesMap);
+    token.setUsernameAttribute(this.usernameAttribute);
     credential.setToken(token);
 
     try {
       credential.setUserAttributes(token.getAttributes());
     } catch (Exception e) {
-      log.warn("Could not decrypt token!");
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.key");
+      log.error("Could not decrypt token: " + e.getMessage());
+      throw new GeneralSecurityException("error.authentication.credentials.bad.token.key");
     }
 
     if (!token.getAttributes().isValid()) {
-      log.warn("Invalid token attributes detected.");
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.missing.required.attributes");
+      log.error("Invalid token attributes detected.");
+      throw new GeneralSecurityException("error.authentication.credentials.missing.required.attributes");
     }
 
     // This username was given in the request URL.
@@ -91,26 +89,27 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     // This username is from the decrypted token.
     String attrUsername = credential.getToken().getAttributes().getUsername();
 
-    log.debug("Got username from token : {}", credUsername);
+    log.debug("Got username from token : {}", attrUsername);
 
     // Get the difference between the generated time and now.
     int genTimeDiff = Math.abs((int) (new Date().getTime() - token.getGenerated()) / 1000);
     log.debug("Token generated {} seconds ago", genTimeDiff);
 
     if (genTimeDiff > this.maxDrift) {
-      log.warn("Authentication Error: Token expired for {}", credUsername);
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.expired");
+      log.error("Authentication Error: Token expired for {}", credUsername);
+      throw new GeneralSecurityException("error.authentication.credentials.bad.token.expired");
     }
 
     if (attrUsername.equals(credUsername)) {
       log.debug("Authentication Success");
-      result = true;
+      return new HandlerResult(
+              this,
+              new BasicCredentialMetaData(credential),
+              this.principalFactory.createPrincipal(credential.getId(), credential.getUserAttributes()));
     } else {
       log.error("Authentication Error: Client passed username [{}], token generated for [{}]", credUsername, attrUsername);
-      throw new BadCredentialsAuthenticationException("error.authentication.credentials.bad.token.username");
+      throw new GeneralSecurityException("error.authentication.credentials.bad.token.username");
     }
-
-    return result;
   }
 
   public final void setKeystore(final Keystore keystore) {
@@ -121,11 +120,11 @@ public final class TokenAuthenticationHandler extends AbstractPreAndPostProcessi
     this.maxDrift = maxDrift;
   }
 
-  public final void setRequiredTokenAttributes(final List requiredTokenAttributes) {
+  public final void setRequiredTokenAttributes(final List<String> requiredTokenAttributes) {
     this.requiredTokenAttributes = requiredTokenAttributes;
   }
 
-  public final void setTokenAttributesMap(final Map tokenAttributesMap) {
-    this.tokenAttributesMap = tokenAttributesMap;
+  public final void setUsernameAttribute(final String attributeName) {
+    this.usernameAttribute = attributeName;
   }
 }

@@ -21,20 +21,21 @@ public class Crypto {
 
   /**
    * Returns an ASCII string that can be used for encrypting/decrypting
-   * data with the AES-128 algorithm. The given seed <strong>does not</strong>
+   * data with the AES-256 algorithm. The given seed <strong>does not</strong>
    * guarantee the same result for subsequent invocations.
    *
    * @param seed A string to seed the generator with.
-   * @return A unique ASCII string that can be used as an AES-128 key, or null.
+   * @return A unique ASCII string that can be used as an AES-256 key, or null.
    */
-  public static String generateAes128KeyWithSeed(String seed) {
+  public static String generateAes256KeyWithSeed(String seed) {
     String returnKey = null;
 
     try {
-      SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
-      byte[] salt = new byte[16];
-      rand.nextBytes(salt);
-      PBEKeySpec password = new PBEKeySpec(seed.toCharArray(), salt, 1000, 128);
+
+      //get salt
+      String salt = Crypto.generateSalt();
+
+      PBEKeySpec password = new PBEKeySpec(seed.toCharArray(), salt.getBytes(), 65536, 256);
       SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
       PBEKey key = (PBEKey) factory.generateSecret(password);
       SecretKey secretKey = new SecretKeySpec(key.getEncoded(), "AES");
@@ -64,7 +65,7 @@ public class Crypto {
       }
       returnKey = keyBuffer.toString();
     } catch (InvalidKeySpecException e) {
-      log.error("Could not find desired key specificatio.");
+      log.error("Could not find desired key specification.");
       log.debug(e.toString());
     } catch (NoSuchAlgorithmException e) {
       log.error("Could not find encryption algorithm.");
@@ -86,7 +87,7 @@ public class Crypto {
    * @throws BadPaddingException
    * @throws IllegalBlockSizeException
    */
-  public static String encryptWithKey(String string, String key)
+  public static String encryptWithKey(String input, String key)
       throws NoSuchPaddingException,
       NoSuchAlgorithmException,
       InvalidKeyException,
@@ -94,31 +95,31 @@ public class Crypto {
       IllegalBlockSizeException,
       InvalidAlgorithmParameterException
   {
-    String encryptedString;
+    byte[] crypted = null;
+    try{
+      // Create a random initialization vector.
+      SecureRandom random = new SecureRandom();
+      byte[] randBytes = new byte[16];
+      random.nextBytes(randBytes);
+      IvParameterSpec iv = new IvParameterSpec(randBytes);
 
-    byte[] encryptedStringData;
-    
-    //Create a random initialization vector
-    SecureRandom random = new SecureRandom();
-    byte[] randBytes = new byte[16];
-    random.nextBytes(randBytes);
-    IvParameterSpec iv = new IvParameterSpec(randBytes);
+      SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      cipher.init(Cipher.ENCRYPT_MODE, skey, iv);
 
-    SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
-    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-    cipher.init(Cipher.ENCRYPT_MODE, skey, iv);
+      byte[] ivBytes = iv.getIV();
+      byte[] inputBytes = input.getBytes();
+      byte[] plaintext = new byte[ivBytes.length + inputBytes.length];
 
-    byte[] ivBytes = iv.getIV();
-    byte[] inputBytes = string.getBytes();
-    byte[] plaintext = new byte[ivBytes.length + inputBytes.length];
+      // Prepend the IV to the ciphertext.
+      System.arraycopy(ivBytes, 0, plaintext, 0, ivBytes.length);
+      System.arraycopy(inputBytes, 0, plaintext, ivBytes.length, inputBytes.length);
 
-    System.arraycopy(ivBytes, 0, plaintext, 0, ivBytes.length);
-    System.arraycopy(inputBytes, 0, plaintext, ivBytes.length, inputBytes.length);
-    
-    encryptedStringData = cipher.doFinal(plaintext);
-    encryptedString = Base64.encodeBase64String(encryptedStringData);
-
-    return encryptedString;
+      crypted = cipher.doFinal(plaintext);
+    }catch(Exception e){
+      log.error(e.toString());
+    }
+    return new String(Base64.encodeBase64(crypted));
   }
 
   /**
@@ -181,5 +182,13 @@ public class Crypto {
     }
 
     return buffer.toString();
+  }
+
+  private static String generateSalt() {
+    SecureRandom random = new SecureRandom();
+    byte bytes[] = new byte[20];
+    random.nextBytes(bytes);
+    String s = new String(bytes);
+    return s;
   }
 }

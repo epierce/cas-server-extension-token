@@ -1,4 +1,4 @@
-/* Copyright 2013 University of South Florida.
+/* Copyright 2015 University of South Florida.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -12,11 +12,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.usf.cims.cas.support.token.authentication.principal;
+package edu.usf.cims.cas.support.token.authentication;
 
 import edu.clayton.cas.support.token.Token;
 import edu.clayton.cas.support.token.TokenAttributes;
-import org.jasig.cas.authentication.principal.Credentials;
+import org.jasig.cas.authentication.Credential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -24,16 +24,16 @@ import org.springframework.util.Assert;
 import java.util.Map;
 
 /**
- * This class creates a CAS-compatible credential using data from an AES128-encrypted token
+ * This class creates a CAS-compatible credential using data from an AES-256 encrypted token
  * 
  * @author Eric Pierce
  * @since 0.1
  */
-public final class TokenCredentials implements Credentials {
+public final class TokenCredential implements Credential {
     
-  private static final long serialVersionUID = 2749515041385101770L;
+  private static final long serialVersionUID = 2749515041385101771L;
 
-  private static final Logger logger = LoggerFactory.getLogger(TokenCredentials.class);
+  private static final Logger logger = LoggerFactory.getLogger(TokenCredential.class);
 
   private Token token;
 
@@ -43,7 +43,7 @@ public final class TokenCredentials implements Credentials {
 
   private Map<String, Object> userAttributes;
 
-  public TokenCredentials(final String username, final String token, final String tokenService) {
+  public TokenCredential(final String username, final String token, final String tokenService) {
     Assert.notNull(token, "token cannot be null");
     Assert.notNull(username, "username cannot be null");
     Assert.notNull(tokenService, "tokenService cannot be null");
@@ -76,11 +76,14 @@ public final class TokenCredentials implements Credentials {
     return this.userAttributes;
   }
 
+  public final String getId() {
+    return this.username;
+  }
 
   /**
    * Create a map of the user's attributes for use by the CAS server classes.
    *
-   * @param userProfile The {@link }
+   * @param userProfile The TokenAttributes
    */
   public void setUserAttributes(TokenAttributes userProfile) {
     Assert.notNull(userProfile);

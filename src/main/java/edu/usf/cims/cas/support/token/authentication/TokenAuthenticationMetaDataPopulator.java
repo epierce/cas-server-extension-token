@@ -1,4 +1,4 @@
-/* Copyright 2013 University of South Florida.
+/* Copyright 2015 University of South Florida.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,38 +14,37 @@
 */
 package edu.usf.cims.cas.support.token.authentication;
 
-import org.jasig.cas.authentication.Authentication;
+import org.jasig.cas.authentication.AuthenticationBuilder;
 import org.jasig.cas.authentication.AuthenticationMetaDataPopulator;
-import org.jasig.cas.authentication.MutableAuthentication;
-import org.jasig.cas.authentication.principal.Credentials;
-import org.jasig.cas.authentication.principal.Principal;
-import org.jasig.cas.authentication.principal.SimplePrincipal;
-import edu.usf.cims.cas.support.token.authentication.principal.TokenCredentials;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jasig.cas.authentication.Credential;
 
 /**
- * This class is a meta data populator for authentication using an encrypted JSON object as a token. 
- * 
+ * Metadata populator for token authentication.
+ *
  * @author Eric Pierce
- * @since 0.1
+ * @since 1.0.0
  */
 public final class TokenAuthenticationMetaDataPopulator implements AuthenticationMetaDataPopulator {
 
-  private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationMetaDataPopulator.class);
-    
-  public Authentication populateAttributes(Authentication authentication, Credentials credentials) {
-    if (credentials instanceof TokenCredentials) {
-      TokenCredentials tokenCredentials = (TokenCredentials) credentials;
-      final Principal simplePrincipal = new SimplePrincipal(authentication.getPrincipal().getId(),
-                                                              tokenCredentials.getUserAttributes());
-      final MutableAuthentication mutableAuthentication = new MutableAuthentication(simplePrincipal,
-                                                                                      authentication.getAuthenticatedDate());
-      logger.debug("attributes : {}",simplePrincipal.getAttributes());
-      mutableAuthentication.getAttributes().putAll(authentication.getAttributes());
-      return mutableAuthentication;
+    /***
+     * Attribute to store the name of the token creator.
+     */
+    public static final String TOKEN_GENERATOR = "tokenGenerator";
+
+    /***
+     * Attribute to store the time of token generation.
+     */
+    public static final String TOKEN_GENERATION_TIME = "generated";
+
+    @Override
+    public void populateAttributes(final AuthenticationBuilder builder, final Credential credential) {
+        final TokenCredential tokenCredential = (TokenCredential) credential;
+        builder.addAttribute(TOKEN_GENERATOR, tokenCredential.getToken().getKeyGenerator());
+        builder.addAttribute(TOKEN_GENERATION_TIME, new java.util.Date(tokenCredential.getToken().getGenerated()).toString());
     }
-    return authentication;
-  }
+
+    @Override
+    public boolean supports(final Credential credential) {
+        return credential instanceof TokenCredential;
+    }
 }

@@ -27,23 +27,23 @@ public class JSONKeystoreTest {
     Key foobarKey = this.keystore.getKeyNamed("foobar");
 
     assertEquals("foo", fooKey.name());
-    assertTrue(new String(fooKey.data()).equals("123456789012345"));
+    assertTrue(new String(fooKey.data()).equals("pqrQtXkVPrKyVEWQwqMmsNCVmqWzhvaK"));
 
     assertEquals("bar", barKey.name());
-    assertTrue(new String(barKey.data()).equals("098765432109876"));
+    assertTrue(new String(barKey.data()).equals("xagkrotMHogRhPpqLtCYsPtbYqdihfqw"));
 
     assertEquals("foobar", foobarKey.name());
-    assertTrue(new String(foobarKey.data()).equals("abcdefghijklmno"));
+    assertTrue(new String(foobarKey.data()).equals("UyfGUrqZeFkDdJDzaCGkCApAAqwJnHLm"));
   }
 
   @Test
   public void testAddRemoveKey() {
-    this.keystore.addKey(new Key("newKey", "123456789012345"));
+    this.keystore.addKey(new Key("newKey", "xTuWpxJkLZpqRtDqXRJHePkeAQLniAXN"));
     Key newKey = this.keystore.getKeyNamed("newKey");
 
     assertNotNull(newKey);
     assertEquals("newKey", newKey.name());
-    assertTrue(new String(newKey.data()).equals("123456789012345"));
+    assertTrue(new String(newKey.data()).equals("xTuWpxJkLZpqRtDqXRJHePkeAQLniAXN"));
 
     this.keystore.removeKeyNamed("newKey");
     assertNull(this.keystore.getKeyNamed("newKey"));
@@ -62,6 +62,6 @@ public class JSONKeystoreTest {
 
     assertNotNull(fooKey);
     assertEquals("foo", fooKey.name());
-    assertTrue(new String(fooKey.data()).equals("123456789012345"));
+    assertTrue(new String(fooKey.data()).equals("pqrQtXkVPrKyVEWQwqMmsNCVmqWzhvaK"));
   }
 }

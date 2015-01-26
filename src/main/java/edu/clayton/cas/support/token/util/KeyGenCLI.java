@@ -18,7 +18,7 @@ public class KeyGenCLI {
     try {
       CommandLine commandLine = parser.parse(options, args);
       String service = commandLine.getOptionValue("service");
-      String key = Crypto.generateAes128KeyWithSeed(service);
+      String key = Crypto.generateAes256KeyWithSeed(service);
 
       if (key == null) {
         throw new Exception("Key was not generated!");

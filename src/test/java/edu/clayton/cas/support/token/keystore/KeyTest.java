@@ -9,14 +9,14 @@ import static org.junit.Assert.assertTrue;
 public class KeyTest {
   @Test
   public void testKey() {
-    Key key = new Key("test", "123456789012345");
+    Key key = new Key("test", "UyfGUrqZeFkDdJDzaCGkCApAAqwJnHLm");
 
     assertEquals("test", key.name());
-    assertTrue(new String(key.data()).equals("123456789012345"));
+    assertTrue(new String(key.data()).equals("UyfGUrqZeFkDdJDzaCGkCApAAqwJnHLm"));
 
-    key = new Key("test", "123456789012345".getBytes());
+    key = new Key("test", "UyfGUrqZeFkDdJDzaCGkCApAAqwJnHLm".getBytes());
     assertEquals("test", key.name());
-    assertTrue(new String(key.data()).equals("123456789012345"));
+    assertTrue(new String(key.data()).equals("UyfGUrqZeFkDdJDzaCGkCApAAqwJnHLm"));
   }
 
   @Test

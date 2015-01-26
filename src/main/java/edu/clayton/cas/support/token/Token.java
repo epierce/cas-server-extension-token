@@ -7,9 +7,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>A {@linkplain Token} is derived from data received from a client. This
@@ -44,8 +42,8 @@ public class Token {
 
   private long generated;
   private TokenAttributes attributes;
-  private List requiredTokenAttributes;
-  private Map tokenAttributesMap;
+  private List<String> requiredTokenAttributes;
+  private String usernameAttribute;
 
   /**
    * Initializes a {@linkplain Token} object from a
@@ -106,6 +104,16 @@ public class Token {
   }
 
   /**
+   * Return the name of the key used to generate this token.  By convention, this is also an identifier for the
+   * application that generated the token.
+   *
+   * @return The key name
+   */
+  public String getKeyGenerator() {
+    return this.key.name();
+  }
+
+  /**
    * Define the crypto key that will be used to decode the {@linkplain Token}
    * data.
    *
@@ -115,12 +123,12 @@ public class Token {
     this.key = key;
   }
 
-  public void setRequiredTokenAttributes(List requiredTokenAttributes) {
+  public void setRequiredTokenAttributes(List<String> requiredTokenAttributes) {
     this.requiredTokenAttributes = requiredTokenAttributes;
   }
 
-  public void setTokenAttributesMap(Map tokenAttributesMap) {
-    this.tokenAttributesMap = tokenAttributesMap;
+  public void setUsernameAttribute(String attributeName) {
+    this.usernameAttribute = attributeName;
   }
 
   private void decryptData() throws Exception {
@@ -140,8 +148,8 @@ public class Token {
       this.generated = jsonObject.getLong("generated");
       this.attributes = new TokenAttributes(
           jsonObject.getJSONObject("credentials").toString(),
-          this.requiredTokenAttributes,
-          this.tokenAttributesMap
+          this.usernameAttribute,
+          this.requiredTokenAttributes
       );
       this.isDecoded = true;
 
@@ -151,5 +159,9 @@ public class Token {
       log.debug(e.toString());
       throw e;
     }
+  }
+
+  public String toString(){
+    return this.getKeyGenerator()+"["+this.getGenerated()+"]";
   }
 }

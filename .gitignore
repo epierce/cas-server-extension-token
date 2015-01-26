@@ -9,3 +9,5 @@ target/
 # IntelliJ Stuff #
 .idea/*
 *.iml
+
+.DS_Store
