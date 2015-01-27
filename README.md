@@ -1,6 +1,6 @@
 # Token Authentication Module for Jasig CAS Server 4
 
-This module allows you to authenticate and pass attributes for a user with a AES-256 encrypted token instead of a password.   
+This module allows you to authenticate and pass attributes for a user with a AES encrypted token instead of a password.   
 
 ## How is the token generated?
 
@@ -23,6 +23,9 @@ The token is a AES encrypted JSON object:
 The _generated_ field is the timestamp in milliseconds, this value is compared against the system time to verify the age of the token.  The _username_ value is also compared to the _username_ request parameter to ensure this token belongs to this user.
 
 All properties of the _credentials_ object will be available to the CAS attribute repository. That is, if you have a property named "ProviderName" in the _credentials_ object, then it will be available under that name for the attribute repository (e.g. `<entry key="CredentialProviderAttribute" value="ProviderName" />`).
+
+## Using Strong encryption (AES-256) in Java
+Due to US export restrictions, Java does not include the ability to use strong encryption.  To enable AES-256 support, you must install the [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html).  Installation instructions and more information on the export restrictions are available in the `README.txt` included in the JCE package.
 
 ## Adding Token authentication support to CAS
 
@@ -80,7 +83,7 @@ The _keystore.json_ file is simply a JSON array of key objects with two properti
         
 The _name_ property of a key could be anything. The _name_ property is matched against the value of the "token_service" parameter that services provide when requesting authorization. For example, `https://cas.example.com/?token_service=key_two&auth_token=…` will attempt to use the above "key_two" to decrypt the given "auth_token".
 
-The _data_ property is the AES key that will be used to decrypt the provided token.  The key must be **EXACTLY** 16 characters
+The _data_ property is the AES key that will be used to decrypt the provided token.  The key must be **EXACTLY** 32 characters
 
 #### requiredTokenAttributes (Optional)
 This bean defines the attributes that **must** be present on the _credentials_ object of the encrypted token in order for the token to be valid. **NOTE: The attribute defined in `usernameAttribute` is always required, wether it is defined in this list or not.** You can define any other required attributes by adding a `requiredTokenAttributes` bean like this:

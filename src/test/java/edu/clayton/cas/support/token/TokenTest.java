@@ -47,6 +47,7 @@ public class TokenTest {
       System.out.println("(http://www.oracle.com/technetwork/java/javase/downloads/index.html)");
       System.out.println("It is the user's responsibility to verify that this action is permissible under local regulations.");
       System.out.println("******************************************************************************************");
+      System.exit(1);
     }
   }
 

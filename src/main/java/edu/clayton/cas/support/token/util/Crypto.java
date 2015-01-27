@@ -78,7 +78,7 @@ public class Crypto {
   /**
    * Returns a {@link Base64} encoded encrypted string.
    *
-   * @param string The string to encrypt.
+   * @param input The string to encrypt.
    * @param key The key to use for encryption.
    * @return The encrypted encoded string.
    * @throws NoSuchPaddingException
@@ -96,29 +96,26 @@ public class Crypto {
       InvalidAlgorithmParameterException
   {
     byte[] crypted = null;
-    try{
-      // Create a random initialization vector.
-      SecureRandom random = new SecureRandom();
-      byte[] randBytes = new byte[16];
-      random.nextBytes(randBytes);
-      IvParameterSpec iv = new IvParameterSpec(randBytes);
+    // Create a random initialization vector.
+    SecureRandom random = new SecureRandom();
+    byte[] randBytes = new byte[16];
+    random.nextBytes(randBytes);
+    IvParameterSpec iv = new IvParameterSpec(randBytes);
 
-      SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
-      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-      cipher.init(Cipher.ENCRYPT_MODE, skey, iv);
+    SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
+    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    cipher.init(Cipher.ENCRYPT_MODE, skey, iv);
 
-      byte[] ivBytes = iv.getIV();
-      byte[] inputBytes = input.getBytes();
-      byte[] plaintext = new byte[ivBytes.length + inputBytes.length];
+    byte[] ivBytes = iv.getIV();
+    byte[] inputBytes = input.getBytes();
+    byte[] plaintext = new byte[ivBytes.length + inputBytes.length];
 
-      // Prepend the IV to the ciphertext.
-      System.arraycopy(ivBytes, 0, plaintext, 0, ivBytes.length);
-      System.arraycopy(inputBytes, 0, plaintext, ivBytes.length, inputBytes.length);
+    // Prepend the IV to the ciphertext.
+    System.arraycopy(ivBytes, 0, plaintext, 0, ivBytes.length);
+    System.arraycopy(inputBytes, 0, plaintext, ivBytes.length, inputBytes.length);
 
-      crypted = cipher.doFinal(plaintext);
-    }catch(Exception e){
-      log.error(e.toString());
-    }
+    crypted = cipher.doFinal(plaintext);
+
     return new String(Base64.encodeBase64(crypted));
   }
 
